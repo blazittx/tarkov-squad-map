@@ -1,4 +1,3 @@
-import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
 import { ReactComponent as GithubIcon } from '../../images/Github.svg';
@@ -12,72 +11,60 @@ import rawVersion from '../../data/version.json';
 const version = rawVersion.version.slice(0, 7);
 
 function Footer() {
-    const { t } = useTranslation();
-
     return (
         <div className={'footer-wrapper'}>
             <div className="footer-section-wrapper about-section-wrapper">
-                <h3>{t('Tarkov.dev')}</h3>
-                <Trans i18nKey={'about-open-source-p'}>
-                    <p>
-                        The whole platform is open source and focused around developers. All code is available on <a href="https://github.com/the-hideout/tarkov-dev" target="_blank" rel="noopener noreferrer"><GithubIcon /> GitHub</a>.
-                    </p>
-                </Trans>
-                <Trans i18nKey={'about-discord-p'}>
-                    <p>
-                        If you wanna have a chat, ask questions or request features, we have a <a href="https://discord.gg/WwTvNe356u" target="_blank" rel="noopener noreferrer"><DiscordIcon /> Discord</a> server.
-                    </p>
-                </Trans>
-                <Trans i18nKey={'about-x-p'}>
-                    <p>
-                        Follow us on <a href="https://x.com/tarkov_dev" target="_blank" rel="noopener noreferrer"><XIcon /> X</a> for all the latest updates.
-                    </p>
-                </Trans>
+                <h3>Tarkov.dev</h3>
                 <p>
-                    <Link to="/about">{t('About')} tarkov.dev</Link>
+                    The whole platform is open source and focused around developers. All code is available on <a href="https://github.com/the-hideout/tarkov-dev" target="_blank" rel="noopener noreferrer"><GithubIcon /> GitHub</a>.
                 </p>
-                <h3>{t('Contributors')}</h3>
-                <p>{t('Massive thanks to all the people who help build and maintain this project!')}</p>
-                <p>{t('Made with ❤️ by the community')}</p>
+                <p>
+                    If you wanna have a chat, ask questions or request features, we have a <a href="https://discord.gg/WwTvNe356u" target="_blank" rel="noopener noreferrer"><DiscordIcon /> Discord</a> server.
+                </p>
+                <p>
+                    Follow us on <a href="https://x.com/tarkov_dev" target="_blank" rel="noopener noreferrer"><XIcon /> X</a> for all the latest updates.
+                </p>
+                <p>
+                    <Link to="/about">About tarkov.dev</Link>
+                </p>
+                <h3>Contributors</h3>
+                <p>Massive thanks to all the people who help build and maintain this project!</p>
+                <p>Made with ❤️ by the community</p>
             </div>
             <div className="footer-section-wrapper">
-                <h3>{t('Supporters')}</h3>
-                <Trans i18nKey={'about-support-ukraine-p'}>
-                    <p>
-                        We encourage everyone who can to donate to support the people of Ukraine.
-                    </p>
-                </Trans>
-                <Trans i18nKey={'about-support-collective-p'}>
-                    <p>
-                        If you'd also like to support this project, you can make a donation and/or become a backer on <a href="https://opencollective.com/tarkov-dev" target="_blank" rel="noopener noreferrer">Open Collective</a>.
-                    </p>
-                </Trans>
-                <h3>{t('Item Data')}</h3>
+                <h3>Supporters</h3>
                 <p>
-                    {t('Fresh EFT data courtesy of')}{' '}
+                    We encourage everyone who can to donate to support the people of Ukraine.
+                </p>
+                <p>
+                    If you'd also like to support this project, you can make a donation and/or become a backer on <a href="https://opencollective.com/tarkov-dev" target="_blank" rel="noopener noreferrer">Open Collective</a>.
+                </p>
+                <h3>Item Data</h3>
+                <p>
+                    Fresh EFT data courtesy of{' '}
                     <a href="https://tarkov-changes.com" target="_blank" rel="noopener noreferrer">
                         <span>Tarkov-Changes</span>
                     </a>
                 </p>
                 <p>
-                    {t('Additional data courtesy of')}{' '}
+                    Additional data courtesy of{' '}
                     <a href="https://www.sp-tarkov.com/" target="_blank" rel="noopener noreferrer">
                         <span>SPT</span>
                     </a>
                 </p>
-                <h3>{t('Map Icons')}</h3>
+                <h3>Map Icons</h3>
                 <p>
-                    {t('Map marker icons by')}{' '}
+                    Map marker icons by{' '}
                     <a href="https://escapefromtarkov.fandom.com/wiki/Escape_from_Tarkov_Wiki" target="_blank" rel="noopener noreferrer">
-                        <span>{t('The Official Escape From Tarkov Wiki')}</span>
+                        <span>The Official Escape From Tarkov Wiki</span>
                     </a>
                 </p>
             </div>
             <div className="footer-section-wrapper">
-                <h3>{t('Resources')}</h3>
+                <h3>Resources</h3>
                 <p>
                     <Link to={'/api/'}>
-                        {t('Tarkov.dev API')}
+                        Tarkov.dev API
                     </Link>
                 </p>
                 <p>
@@ -87,25 +74,25 @@ function Footer() {
                 </p>
                 <p>
                     <Link to={'/moobot'}>
-                        {t('{{bot}} integration', { bot: 'Moobot' })}
+                        Moobot integration
                     </Link>
                 </p>
                 <p>
                     <Link to={'/nightbot/'}>
-                        {t('{{bot}} integration', { bot: 'Nightbot' })}
+                        Nightbot integration
                     </Link>
                 </p>
                 <p>
                     <Link to={'/streamelements/'}>
-                        {t('{{bot}} integration', { bot: 'StreamElements' })}
+                        StreamElements integration
                     </Link>
                 </p>
                 <p>
                     <a href={'https://discord.com/api/oauth2/authorize?client_id=955521336904667227&permissions=309237664832&scope=bot%20applications.commands'}>
-                        {t('Discord bot for your Discord')}
+                        Discord bot for your Discord
                     </a>
                 </p>
-                <h3>{t('External resources')}</h3>
+                <h3>External resources</h3>
                 <p>
                     <a href="https://tarkovtracker.io/" target="_blank" rel="noopener noreferrer">
                         TarkovTracker.io
@@ -121,17 +108,13 @@ function Footer() {
                 </p>
             </div>
             <div className="copyright-wrapper">
-                {t(
-                    'Tarkov.dev is a fork of the now shut-down tarkov-tools.com | Big thanks to kokarn for all his work building Tarkov Tools and the community around it.',
-                )}
+                Tarkov.dev is a fork of the now shut-down tarkov-tools.com | Big thanks to kokarn for all his work building Tarkov Tools and the community around it.
             </div>
             <div className="copyright-wrapper">
-                {t(
-                    'Game content and materials are trademarks and copyrights of Battlestate Games and its licensors. All rights reserved.',
-                )}
+                Game content and materials are trademarks and copyrights of Battlestate Games and its licensors. All rights reserved.
             </div>
             <div className="copyright-wrapper">
-                {t('version')} {': '}
+                version {': '}
                 <a href="https://github.com/the-hideout/tarkov-dev/commits/main" target="_blank" rel="noopener noreferrer">{version}</a>
             </div>
         </div>

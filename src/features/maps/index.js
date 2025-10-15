@@ -20,10 +20,32 @@ import {
 import doFetchMaps from './do-fetch-maps.mjs';
 import { langCode, useLangCode } from '../../modules/lang-helpers.js';
 import { placeholderMaps } from '../../modules/placeholder-data.js';
-import i18n from '../../i18n.js';
 import { windowHasFocus } from '../../modules/window-focus-handler.mjs';
 
 import rawMapData from '../../data/maps.json';
+
+// Map names and descriptions in English
+const mapTranslations = {
+    'ground-zero': { name: 'Ground Zero', description: 'Ground Zero is a new map introduced in Escape from Tarkov.' },
+    'streets-of-tarkov': { name: 'Streets of Tarkov', description: 'Streets of Tarkov is a large urban map with many buildings and streets.' },
+    'customs': { name: 'Customs', description: 'Customs is a medium-sized map featuring a customs checkpoint and industrial areas.' },
+    'factory': { name: 'Factory', description: 'Factory is a small, intense map perfect for quick raids.' },
+    'interchange': { name: 'Interchange', description: 'Interchange is a large shopping mall with multiple floors and stores.' },
+    'the-lab': { name: 'The Lab', description: 'The Lab is a high-risk, high-reward underground facility.' },
+    'the-labyrinth': { name: 'The Labyrinth', description: 'The Labyrinth is a complex underground maze.' },
+    'lighthouse': { name: 'Lighthouse', description: 'Lighthouse is a coastal map with a lighthouse and surrounding areas.' },
+    'reserve': { name: 'Reserve', description: 'Reserve is a military base with underground bunkers and surface facilities.' },
+    'shoreline': { name: 'Shoreline', description: 'Shoreline is a large map featuring a resort and surrounding areas.' },
+    'woods': { name: 'Woods', description: 'Woods is a forested map with scattered buildings and natural cover.' },
+    'openworld': { name: 'Openworld', description: 'This is an imagination of what the full map of Tarkov could look like. This open world map would likely include all of the key locations from the existing maps combined in a huge single map.' }
+};
+
+const projectionTranslations = {
+    '2d': '2D',
+    '3d': '3D',
+    'interactive': 'Interactive',
+    'landscape': 'Landscape'
+};
 
 const initialState = {
     data: placeholderMaps(langCode()),
@@ -62,7 +84,6 @@ export const mapsReducer = mapsSlice.reducer;
 export const selectMaps = (state) => state.maps.data;
 
 let fetchedLang = false;
-let fetchedGameMode = false;
 let refreshInterval = false;
 
 const clearRefreshInterval = () => {
@@ -105,11 +126,11 @@ export const useMapImages = () => {
             mapImages[imageData.key] = {
                 id: apiData?.id,
                 ...imageData,
-                name: apiData?.name || i18n.t(`${mapGroup.normalizedName}-name`, { ns: 'maps' }),
+                name: apiData?.name || mapTranslations[mapGroup.normalizedName]?.name || mapGroup.normalizedName,
                 normalizedName: mapGroup.normalizedName,
                 primaryPath: mapGroup.primaryPath,
-                displayText: apiData?.name || i18n.t(`${mapGroup.normalizedName}-name`, { ns: 'maps' }),
-                description: apiData?.description || i18n.t(`${mapGroup.normalizedName}-description`, { ns: 'maps' }),
+                displayText: apiData?.name || mapTranslations[mapGroup.normalizedName]?.name || mapGroup.normalizedName,
+                description: apiData?.description || mapTranslations[mapGroup.normalizedName]?.description || '',
                 duration: apiData?.raidDuration ? apiData?.raidDuration + ' min' : undefined,
                 players: apiData?.players || mapGroup.players,
                 image: `/maps/${imageData.key}.jpg`,
@@ -133,12 +154,12 @@ export const useMapImages = () => {
                 stationaryWeapons: apiData?.stationaryWeapons || [],
                 artillery: apiData?.artillery,
             };
-            mapImages[imageData.key].displayVariant = i18n.t(imageData.projection, { ns: 'maps' });
+            mapImages[imageData.key].displayVariant = projectionTranslations[imageData.projection] || imageData.projection;
             if (imageData.orientation) {
-                mapImages[imageData.key].displayVariant += ` - ${i18n.t(imageData.orientation, { ns: 'maps' })}`;
+                mapImages[imageData.key].displayVariant += ` - ${imageData.orientation}`;
             }
             if (imageData.specific) {
-                mapImages[imageData.key].displayVariant += ` - ${i18n.t(imageData.specific, { ns: 'maps' })}`;
+                mapImages[imageData.key].displayVariant += ` - ${imageData.specific}`;
             }
             if (imageData.extra) {
                 mapImages[imageData.key].displayVariant += ` - ${imageData.extra}`;

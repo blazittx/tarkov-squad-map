@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom';
 import { Menu } from '@mui/material';
 import { Icon } from '@mdi/react';
 import { mdiDotsVertical } from '@mdi/js';
-import { useTranslation } from 'react-i18next';
 import classnames from 'classnames';
 
 export default function OverflowMenu({ children, className, visibilityMap }) {
-    const { t } = useTranslation();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const triggerRef = useRef(null);
@@ -72,7 +70,7 @@ export default function OverflowMenu({ children, className, visibilityMap }) {
         ` ${shouldShowMenu ? 'visible-overflow visible-menu-all' : 'invisible-overflow'}`;
     return (
         <li className={className} ref={triggerRef}>
-            <Link alt={t('More')} to="#" onClick={handleClick} onMouseEnter={handleClick}>
+            <Link alt="More" to="#" onClick={handleClick} onMouseEnter={handleClick}>
                 <Icon path={mdiDotsVertical} size={1} className="icon-with-text" />
             </Link>
             <Menu

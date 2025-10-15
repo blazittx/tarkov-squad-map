@@ -1,7 +1,6 @@
 import { useEffect, useRef, useMemo, useCallback, useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import {
     TransformWrapper,
     TransformComponent,
@@ -270,11 +269,7 @@ function Map() {
 
     const focusItem = useRef(searchParams.get('q') ? searchParams.get('q').split(',') : []);
 
-    const { t } = useTranslation();
     const dispatch = useDispatch();
-    const tMaps = useCallback((string) => {
-        return t(string, { ns: 'maps' })
-    }, [t]);
 
     const [savedMapSettings, setSavedMapSettings] = useStateWithLocalStorage(
         'savedMapSettings',
@@ -388,7 +383,7 @@ function Map() {
             collapsed: !mapSettingsRef.current.expandMapLegend,
             groupCheckboxes: true,
             groupsCollapsable: true,
-            exclusiveOptionalGroups: [tMaps('Levels')],
+            exclusiveOptionalGroups: ['Levels'],
         }).addTo(map);
         layerControl.on('layerToggle', (e) => {
             const layerState = e.detail;
@@ -457,8 +452,8 @@ function Map() {
 
         map.addControl(new L.Control.Fullscreen({
             title: {
-                'false': tMaps('View Fullscreen'),
-                'true': tMaps('Exit Fullscreen'),
+                'false': 'View Fullscreen',
+                'true': 'Exit Fullscreen',
             }
         }));
 
@@ -478,10 +473,10 @@ function Map() {
             hidden: false,
             position: 'bottomright',
             activeTasksChecked: mapSettingsRef.current.showOnlyActiveTasks,
-            activeTasksLabel: tMaps('Only show markers for active tasks'),
+            activeTasksLabel: 'Only show markers for active tasks',
             expandMapLegendChecked: mapSettingsRef.current.expandMapLegend,
-            expandMapLegendLabel: tMaps('Don\'t collapse layers control'),
-            playerLocationLabel: tMaps('Use TarkovMonitor to show your position'),
+            expandMapLegendLabel: 'Don\'t collapse layers control',
+            playerLocationLabel: 'Use TarkovMonitor to show your position',
             collapsed: true,
         }).addTo(map);
         map.settingsControl.on('settingChanged', (e) => {
@@ -501,14 +496,14 @@ function Map() {
 
         map.raidInfoControl = L.control.raidInfo({
             position: 'topright',
-            durationLabel: t('Duration'),
-            playersLabel: t('Players'),
-            bylabel: t('By'),
+            durationLabel: 'Duration',
+            playersLabel: 'Players',
+            bylabel: 'By',
         }).addTo(map);
 
         map.searchControl = L.control.mapSearch({
-            placeholderText: tMaps('Task, item or container...'),
-            descriptionText: tMaps("Supports multisearch (e.g. 'labs, ledx, bitcoin')"),
+            placeholderText: 'Task, item or container...',
+            descriptionText: "Supports multisearch (e.g. 'labs, ledx, bitcoin')",
             collapsed: true,
         }).addTo(map);
 
@@ -573,7 +568,7 @@ function Map() {
             levels[activeIndex].addTo(map);
         }, {capture: true});
 
-    }, [t, tMaps, updateSavedMapSettings]);
+    }, [updateSavedMapSettings]);
 
     useEffect(() => {
         if (!mapRef.current?.searchControl) {
@@ -598,36 +593,36 @@ function Map() {
 
     const categories = useMemo(() => {
         return {
-            'extract_pmc': tMaps('PMC'),
-            'extract_shared': tMaps('Shared'),
-            'extract_scav': tMaps('Scav'),
-            'extract_transit': tMaps('Transit'),
-            'spawn_sniper_scav': tMaps('Sniper Scav'),
-            'spawn_pmc': tMaps('PMC'),
-            'spawn_scav': tMaps('Scav'),
-            'spawn_boss': tMaps('Boss'),
-            'quest_item': tMaps('Item'),
-            'quest_objective': tMaps('Objective'),
-            'lock': tMaps('Locks'),
-            'lever': tMaps('Lever'),
-            'stationarygun': tMaps('Stationary Gun'),
-            'switch': tMaps('Switch'),
-            'place-names': tMaps('Place Names'),
+            'extract_pmc': 'PMC',
+            'extract_shared': 'Shared',
+            'extract_scav': 'Scav',
+            'extract_transit': 'Transit',
+            'spawn_sniper_scav': 'Sniper Scav',
+            'spawn_pmc': 'PMC',
+            'spawn_scav': 'Scav',
+            'spawn_boss': 'Boss',
+            'quest_item': 'Item',
+            'quest_objective': 'Objective',
+            'lock': 'Locks',
+            'lever': 'Lever',
+            'stationarygun': 'Stationary Gun',
+            'switch': 'Switch',
+            'place-names': 'Place Names',
         };
-    }, [tMaps]);
+    }, []);
 
     const getLayerOptions = useCallback((layerKey, groupKey, layerName, imageUrl) => {
         return {
             groupKey,
             layerKey,
-            groupName: tMaps(groupKey),
+            groupName: groupKey,
             layerName: layerName || categories[layerKey] || layerKey,
             groupHidden: Boolean(mapSettingsRef.current.hiddenGroups?.includes(groupKey)),
             layerHidden: Boolean(mapSettingsRef.current.hiddenLayers?.includes(layerKey)),
             image: imageUrl ??= images[layerKey] ? `${process.env.PUBLIC_URL}/maps/interactive/${images[layerKey]}.png` : undefined,
             groupCollapsed: Boolean(mapSettingsRef.current.collapsedGroups?.includes(groupKey)),
         };
-    }, [tMaps, categories]);
+    }, [categories]);
 
     const addLayer = useCallback((layer, layerKey, groupKey, layerName, imageUrl) => {
         /*for (const layerId in layer._layers) {
@@ -775,8 +770,8 @@ function Map() {
 
         // only add selector if there are multiple
         if (tileLayer && svgLayer) {
-            layerControl.addBaseLayer(tileLayer, tMaps('Satellite'));
-            layerControl.addBaseLayer(svgLayer, tMaps('Abstract'));
+            layerControl.addBaseLayer(tileLayer, 'Satellite');
+            layerControl.addBaseLayer(svgLayer, 'Abstract');
         }
 
         for (const baseLayer of baseLayers) {
@@ -852,7 +847,7 @@ function Map() {
                         } else if (baseLayer._container && !layer.show) {
                             baseLayer._container.classList.add('off-level');
                         }
-                        map.layerControl.updateBadge(tMaps(layer.name));
+                        map.layerControl.updateBadge(layer.name);
                     });
                     heightLayer.on('remove', () => {
                         const heightLayer = Object.values(map._layers).findLast(l => l.options?.extents);
@@ -879,7 +874,7 @@ function Map() {
                         heightLayer.addTo(map);
                     }
 
-                    layerControl.addOverlay(heightLayer, tMaps(layer.name), {groupName: tMaps('Levels')});
+                    layerControl.addOverlay(heightLayer, layer.name, {groupName: 'Levels'});
                 }
             });
         }
@@ -915,7 +910,7 @@ function Map() {
                 const rotation = label.rotation ? label.rotation : 0;
                 const labelMarker = L.marker(pos({x: label.position[0], z: label.position[1]}), {
                     icon: L.divIcon({
-                        html: `<div class="label" style="font-size: ${fontSize}%; transform: translate3d(-50%, -50%, 0) rotate(${rotation}deg)">${tMaps(label.text)}</div>`,
+                        html: `<div class="label" style="font-size: ${fontSize}%; transform: translate3d(-50%, -50%, 0) rotate(${rotation}deg)">${label.text}</div>`,
                         className: 'map-area-label',
                         //layers: baseLayers,
                     }),
@@ -961,13 +956,13 @@ function Map() {
                 if (items.length > 0) {
                     var section;
                     if (category.startsWith('extract')) {
-                        section = tMaps('Extracts');
+                        section = 'Extracts';
                     }
                     else if (category.startsWith('spawn')) {
-                        section = tMaps('Spawns');
+                        section = 'Spawns';
                     }
                     else {
-                        section = tMaps('Lootable Items');
+                        section = 'Lootable Items';
                     }
                     markerLayer.addTo(map);
                     addLayer(markerLayer, category, section);
@@ -992,19 +987,19 @@ function Map() {
 
             const positionMarker = L.marker([0,0], {icon: playerIcon, position: {x: 0, y: 0, z: 0}}).addTo(positionLayer);
             const closeButton = L.DomUtil.create('a');
-            closeButton.innerHTML = tMaps('Clear');
+            closeButton.innerHTML = 'Clear';
             closeButton.addEventListener('click', () => {
                 positionLayer.remove(positionMarker);
             });
             positionMarker.bindPopup(L.popup().setContent(closeButton));
             positionLayer.addTo(map);
-            layerControl.addOverlay(positionLayer, tMaps('Player'), tMaps('Misc'));
+            layerControl.addOverlay(positionLayer, 'Player', 'Misc');
         }
 
         //map.fitWorld({maxZoom: 0, animate: false});
         //map.setView(L.latLngBounds(bounds).getCenter(), 2, {animate: false});
         map.fitBounds(L.latLngBounds(bounds));
-    }, [currentMap, tMaps, updateSavedMapSettings, addLayer]);
+    }, [currentMap, updateSavedMapSettings, addLayer]);
 
     // load markers from API maps data
     useEffect(() => {
@@ -1209,7 +1204,7 @@ function Map() {
                 if (extract.switches?.length > 0) {
                     popup ??= L.DomUtil.create('div');
                     const textElement = L.DomUtil.create('div');
-                    textElement.textContent = `${tMaps('Activated by')}:`;
+                    textElement.textContent = 'Activated by:';
                     popup.appendChild(textElement);
                     for (const sw of extract.switches) {
                         const linkElement = getPoiLinkElement(sw.id, 'switch');
@@ -1226,7 +1221,7 @@ function Map() {
                         itemCount = ` x ${extract.transferItem.count.toLocaleString()}`
                     }
                     const transferText = L.DomUtil.create('div', undefined, popup);
-                    transferText.innerText = `${tMaps('Required item')}:`;
+                    transferText.innerText = 'Required item:';
                     const itemName = `${extract.transferItem.item.name}${itemCount}`;
                     const itemImage = L.DomUtil.create('img', 'popup-item');
                     itemImage.setAttribute('src', `${extract.transferItem.item.baseImageLink}`);
@@ -1365,7 +1360,7 @@ function Map() {
                 popup.append(switchNameElement);
                 if (sw.activatedBy) {
                     const textElement = L.DomUtil.create('div');
-                    textElement.textContent = `${tMaps('Activated by')}:`;
+                    textElement.textContent = 'Activated by:';
                     popup.appendChild(textElement);
                     const linkElement = getPoiLinkElement(sw.activatedBy.id, 'switch');
                     const nameElement = L.DomUtil.create('span');
@@ -1375,7 +1370,7 @@ function Map() {
                 }
                 if (sw.activates.length > 0) {
                     const textElement = L.DomUtil.create('div');
-                    textElement.textContent = `${tMaps('Activates')}:`;
+                    textElement.textContent = 'Activates:';
                     popup.append(textElement);
                 }
                 for (const switchOperation of sw.activates) {
@@ -1498,7 +1493,7 @@ function Map() {
                         popupAnchor: [0, -12],
                     });
 
-                    const artyName = t('Mortar');
+                    const artyName = 'Mortar';
                     
                     const hazardMarker = L.marker(pos(hazard.position), {
                         icon: hazardIcon, 
@@ -1512,7 +1507,7 @@ function Map() {
                     });
                     const popup = L.DomUtil.create('div');
                     const hazardText = L.DomUtil.create('div', undefined, popup);
-                    hazardText.textContent = t('Mortar');
+                    hazardText.textContent = 'Mortar';
                     addElevation(hazard, popup);
                     hazardMarker.bindPopup(L.popup().setContent(popup));
     
@@ -1552,7 +1547,7 @@ function Map() {
         // maxBounds are bigger than the map and the map center is not in 0,0 so we need to move the view to real center
         // console.log("Center:", L.latLngBounds(bounds).getCenter(true));
         //map.setView(L.latLngBounds(bounds).getCenter(true), undefined, {animate: false});
-    }, [mapData, t, updateSavedMapSettings, addLayer, categories, tMaps, getPoiLinkElement]);
+    }, [mapData, updateSavedMapSettings, addLayer, categories, getPoiLinkElement]);
 
     // for markers requiring quests
     useEffect(() => {
@@ -1632,22 +1627,22 @@ function Map() {
                 });
                 var lockTypeText;
                 if (lock.lockType === 'door') {
-                    lockTypeText = tMaps('Door');
+                    lockTypeText = 'Door';
                 }
                 else if (lock.lockType === 'container') {
-                    lockTypeText = tMaps('Container');
+                    lockTypeText = 'Container';
                 }
                 else if (lock.lockType === 'trunk') {
-                    lockTypeText = tMaps('Car Door or Trunk');
+                    lockTypeText = 'Car Door or Trunk';
                 }
                 else {
-                    lockTypeText = tMaps('Lock');
+                    lockTypeText = 'Lock';
                 }
                 
                 const lockMarker = L.marker(pos(lock.position), {
                     icon: lockIcon,
                     position: lock.position,
-                    title: `${tMaps('Lock')}: ${key.name}`,
+                    title: `Lock: ${key.name}`,
                     id: key.id,
                     riseOnHover: true,
                 });
@@ -1657,7 +1652,7 @@ function Map() {
                 lockTypeNode.innerHTML = `<strong>${lockTypeText}</strong>`;
                 if (lock.needsPower) {
                     const powerNode = L.DomUtil.create('div', undefined, popupContent);
-                    powerNode.innerHTML = `<em>${tMaps('Needs power')}</em>`;
+                    powerNode.innerHTML = `<em>Needs power</em>`;
                 }
                 const lockImage = L.DomUtil.create('img', 'popup-item');
                 lockImage.setAttribute('src', `${key.baseImageLink}`);
@@ -1693,7 +1688,7 @@ function Map() {
                 }
                 let iconSize = [24, 24];
                 let iconUrl = `${process.env.PUBLIC_URL}/maps/interactive/${images.loose_loot}.png`;
-                let markerTitle = t('Loose Loot');
+                let markerTitle = 'Loose Loot';
                 let className = '';
                 const markerCategories = lootItems.reduce((markerCategories, item) => {
                     const category = metaData.handbookCategories.find(c => c.id === item.handbookCategories[0].id);
@@ -1781,7 +1776,7 @@ function Map() {
             }
         }
         refreshMapSearch();
-    }, [mapData, addLayer, t, tMaps, getPoiLinkElement]);
+    }, [mapData, addLayer, getPoiLinkElement]);
 
     useEffect(() => {
         if (!mapData || mapData.projection !== 'interactive') {
@@ -1817,20 +1812,20 @@ function Map() {
                   
             const positionMarker = L.marker(pos(playerPosition.position), {icon: playerIcon, zIndexOffset: 1000, position: playerPosition.position, markerType: 'playerPosition'}).addTo(positionLayer);
             const closeButton = L.DomUtil.create('a');
-            closeButton.innerHTML = tMaps('Clear');
+            closeButton.innerHTML = 'Clear';
             closeButton.addEventListener('click', () => {
             });
             positionMarker.bindPopup(L.popup().setContent(closeButton));
             positionMarker.on('add', checkMarkerForActiveLayers);
             positionMarker.on('click', activateMarkerLayer);
             positionLayer.addTo(mapRef.current);
-            //layerControl.addOverlay(positionLayer, tMaps('Player'), tMaps('Misc'));
+            //layerControl.addOverlay(positionLayer, 'Player', 'Misc');
             addLayer(positionLayer, 'player_position', 'Misc');
             activateMarkerLayer({target: positionMarker});
             mapRef.current.panTo(pos(playerPosition.position), {animate: true});
             refreshMapSearch();
         }
-    }, [mapData, playerPosition, addLayer, dispatch, tMaps]);
+    }, [mapData, playerPosition, addLayer, dispatch]);
     
     if (!mapData) {
         return <ErrorPage />;
@@ -1838,7 +1833,7 @@ function Map() {
 
     return [
         <SEO 
-            title={`${t('Map of {{mapName}}', {mapName: mapData.displayText})} - ${t('Escape from Tarkov')} - ${t('Tarkov.dev')}`}
+            title={`Map of ${mapData.displayText} - Escape from Tarkov - Tarkov.dev`}
             description={mapData.description}
             image={`${window.location.origin}${process.env.PUBLIC_URL}${mapData.imageThumb}`}
             card='summary_large_image'
@@ -1867,10 +1862,10 @@ function Map() {
                 <TransformComponent>
                     <div className="map-image-wrapper">
                         <img
-                            alt={t('Map of {{mapName}}', {mapName: mapData.displayText})}
+                            alt={`Map of ${mapData.displayText}`}
                             loading="lazy"
                             className="map-image"
-                            title={t('Map of {{mapName}}', {mapName: mapData.displayText})}
+                            title={`Map of ${mapData.displayText}`}
                             src={`${process.env.PUBLIC_URL}${mapData.image}`}
                         />
                     </div>

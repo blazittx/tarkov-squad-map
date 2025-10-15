@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Trans, useTranslation } from 'react-i18next';
 
 import { Icon } from '@mdi/react';
 import { mdiMap } from '@mdi/js';
@@ -12,7 +11,6 @@ import './index.css';
 import { HashLink } from 'react-router-hash-link';
 
 function Maps() {
-    const { t } = useTranslation();
     const mapImagesSortedArray = useMapImagesSortedArray();
     const uniqueMaps = mapImagesSortedArray.reduce((maps, current) => {
         if (!maps.some(storedMap => storedMap.normalizedName === current.normalizedName)) {
@@ -26,23 +24,21 @@ function Maps() {
     }, []);
     return [
         <SEO 
-            title={`${t('Maps')} - ${t('Escape from Tarkov')} - ${t('Tarkov.dev')}`}
-            description={t('maps-page-description', 'Get the latest information on all maps in Escape from Tarkov, including extract points and loot locations. Find out where to find the best gear and resources in the game')}
+            title="Maps - Escape from Tarkov - Tarkov.dev"
+            description="Get the latest information on all maps in Escape from Tarkov, including extract points and loot locations. Find out where to find the best gear and resources in the game"
             key="seo-wrapper"
         />,
         <div className={'page-wrapper'} key="map-page-wrapper">
             <h1 className="center-title">
-                {t('Escape from Tarkov')} 
+                Escape from Tarkov 
                 <Icon path={mdiMap} size={1.5} className="icon-with-text" /> 
-                {t('Maps')}
+                Maps
             </h1>
             <div className="page-wrapper map-page-wrapper">
-                <Trans i18nKey={'maps-page-p'}>
-                    <p>
-                        There are 11 different locations on the Escape from Tarkov map, of which 10 have been released publicly so far.
-                        Although eventually all maps will be connected, they are currently all apart from one another.
-                    </p>
-                </Trans>
+                <p>
+                    There are 11 different locations on the Escape from Tarkov map, of which 10 have been released publicly so far.
+                    Although eventually all maps will be connected, they are currently all apart from one another.
+                </p>
 
                 <nav className="nav-maps">
                   {uniqueMaps.map((map) => (
@@ -73,20 +69,7 @@ function Maps() {
                                 className="icon-with-text"
                               />
                             </span>
-                            {
-                                // t('Streets of Tarkov')
-                                // t('Ground Zero')
-                                // t('Customs')
-                                // t('Factory')
-                                // t('Interchange')
-                                // t('The Lab')
-                                // t('Lighthouse')
-                                // t('Reserve')
-                                // t('Shoreline')
-                                // t('Woods')
-                                // t('Openworld')
-                                mapsGroup.name
-                            }
+                            {mapsGroup.name}
                         </h2>
                         <div className="page-wrapper map-page-wrapper">
                             {mapsGroup.description}
@@ -105,10 +88,10 @@ function Maps() {
                                 <div className="map-wrapper" key={`map-wrapper-${key}`}>
                                     <Link to={`/map/${key}`}>
                                         <img
-                                            alt={t('Map of {{mapName}}', {mapName: displayText})}
+                                            alt={`Map of ${displayText}`}
                                             className="map-image"
                                             loading="lazy"
-                                            title={t('Map of {{mapName}}', {mapName: displayText})}
+                                            title={`Map of ${displayText}`}
                                             src={mapImageLink}
                                         />
                                         <h3>{displayVariant}</h3>

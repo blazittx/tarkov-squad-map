@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useTranslation, withTranslation } from 'react-i18next';
 import Select from 'react-select';
-
-import i18n from '../../i18n.js';
 
 import SEO from '../../components/SEO.jsx';
 import { InputFilter, ToggleFilter } from '../../components/filter/index.js';
@@ -27,7 +24,6 @@ import {
 import useHideoutData from '../../features/hideout/index.js';
 import useTradersData from '../../features/traders/index.js';
 
-import supportedLanguages from '../../data/supported-languages.json';
 import gameModes from '../../data/game-modes.json';
 
 import { getWipeData } from '../wipe-length/index.js';
@@ -50,9 +46,10 @@ const trackerDomains = [
     { value: 'ja', label: 'ja' },
     { value: 'pl', label: 'pl' },
 ]*/
-const langOptions = supportedLanguages.map(lang => {
-    return {value: lang, label: lang};
-});
+// Language options removed since we're English-only
+// const langOptions = supportedLanguages.map(lang => {
+//     return {value: lang, label: lang};
+// });
 
 export function getNumericSelect(min, max) {
     let returnOptions = [];
@@ -69,7 +66,6 @@ export function getNumericSelect(min, max) {
 
 function Settings() {
     const dispatch = useDispatch();
-    const { t } = useTranslation();
     //const allTraders = useSelector(traderSettings);
     const allStations = useSelector(selectAllStations);
     const allSkills = useSelector(selectAllSkills);
@@ -121,7 +117,7 @@ function Settings() {
                     value: allStations[stationKey],
                     label: allStations[stationKey]
                         ? allStations[stationKey].toString()
-                        : t('Not built'),
+                        : 'Not built',
                 });
             }
         }
@@ -141,13 +137,13 @@ function Settings() {
         trackerTokenRef.current.value = '';
     }, [dispatch]);
 
-    // Setup language selector
-    const [language, setLanguage] = useState("id");
-    const handleLangChange = event => {
-        const lang = event.value;
-        setLanguage(lang);
-        i18n.changeLanguage(lang);
-    };
+    // Setup language selector - removed since we're English-only
+    // const [language, setLanguage] = useState("id");
+    // const handleLangChange = event => {
+    //     const lang = event.value;
+    //     setLanguage(lang);
+    //     i18n.changeLanguage(lang);
+    // };
 
     // cheeki breeki
     const [isShown, setIsShown] = useState(false);
@@ -168,40 +164,25 @@ function Settings() {
     const wipeLength = getWipeData()[0].lengthDays;
     const estimatedAvgPlayerLevel = Math.round(30 * Math.atan(wipeLength / 38));
 
-    return (
+    return [
         <SEO 
-            title={`${t('Settings')} - ${t('Tarkov.dev')}`}
-            description={t('settings-page-description', 'This page contains user settings on Tarkov.dev.')}
+            title="Settings - Tarkov.dev"
+            description="This page contains user settings on Tarkov.dev."
             key="seo-wrapper"
         />,
         <div className={'page-wrapper'}>
-            <h1>{t('Settings')}</h1>
-            <div className="language-toggle-wrapper settings-group-wrapper">
-                <h2>{t('Language')}</h2>
-                <Select
-                    placeholder={i18n.language}
-                    options={langOptions}
-                    className="basic-multi-select"
-                    classNamePrefix="select"
-                    onChange={(event) => {
-                        handleLangChange({
-                            target: language,
-                            value: event.value,
-                        })
-                    }}
-                />
-            </div>
+            <h1>Settings</h1>
             <div className={'settings-group-wrapper'}>
-                <h2>{t('General')}</h2>
+                <h2>General</h2>
                 <label className={'single-filter-wrapper'}>
-                    <span className={'single-filter-label'}>{t('Game mode')}</span>
+                    <span className={'single-filter-label'}>Game mode</span>
                     <Select
-                        label={t('Game mode')}
-                        placeholder={t(`game_mode_${gameMode}`)}
+                        label="Game mode"
+                        placeholder={gameMode === 'regular' ? 'PVP' : 'PVE'}
                         value={gameMode}
                         options={gameModes.map(m => {
                             return {
-                                label: t(`game_mode_${m}`),
+                                label: m === 'regular' ? 'PVP' : 'PVE',
                                 value: m,
                             }
                         })}
@@ -214,13 +195,13 @@ function Settings() {
                     />
                 </label>
                 <ToggleFilter
-                    label={t('Has flea')}
+                    label="Has flea"
                     onChange={() => dispatch(toggleFlea(!hasFlea))}
                     checked={hasFlea}
                     disabled={useTarkovTracker}
                 />
                 <ToggleFilter
-                    label={t('Use TarkovTracker')}
+                    label="Use TarkovTracker"
                     onChange={() =>
                         dispatch(toggleTarkovTracker(!useTarkovTracker))
                     }
@@ -230,22 +211,22 @@ function Settings() {
                     parentRef={trackerTokenRef}
                     label={
                         <a href={`https://${selectedTrackerDomain}/settings`} target="_blank" rel="noopener noreferrer">
-                            {t('TarkovTracker API Token')}
+                            TarkovTracker API Token
                         </a>
                     }
                     defaultValue={useSelector(
                         (state) => state.settings[state.settings.gameMode].tarkovTrackerAPIKey,
                     )}
                     type="text"
-                    placeholder={t('API Token')}
+                    placeholder="API Token"
                     onChange={(event) => {
                         dispatch(setTarkovTrackerAPIKey(event.target.value));
                     }}
                 />
                 <label className={'single-filter-wrapper'}>
-                    <span className={'single-filter-label'}>{t('Tracker Service')}</span>
+                    <span className={'single-filter-label'}>Tracker Service</span>
                     <Select
-                        label={t('Tracker Service')}
+                        label="Tracker Service"
                         value={selectedTrackerDomain}
                         defaultValue={trackerDomain}
                         placeholder={selectedTrackerDomain}
@@ -262,7 +243,7 @@ function Settings() {
                 </label>
             </div>
             <div className="settings-group-wrapper">
-                <h2>{t('Traders')}</h2>
+                <h2>Traders</h2>
                 {traders.map((trader) => {
 
                     return (
@@ -276,7 +257,7 @@ function Settings() {
                 })}
             </div>
             <div className="settings-group-wrapper">
-                <h2>{t('Stations')}</h2>
+                <h2>Stations</h2>
                 {stations.map((station) => {
                     return (
                         <StationSkillTraderSetting
@@ -292,7 +273,7 @@ function Settings() {
                 })}
             </div>
             <div className="settings-group-wrapper">
-                <h2>{t('Skills')}</h2>
+                <h2>Skills</h2>
                 {Object.keys(allSkills).map((skillKey) => {
                     return (
                         <StationSkillTraderSetting
@@ -304,19 +285,19 @@ function Settings() {
                 })}
             </div>
             <div className="settings-group-wrapper">
-                <h2>{t('Dogtag Barters')}</h2>
+                <h2>Dogtag Barters</h2>
                 <ToggleFilter
                     checked={hideDogtagBarters}
-                    label={t('Exclude')}
+                    label="Exclude"
                     onChange={(e) => dispatch(toggleHideDogtagBarters(!hideDogtagBarters))}
                     tooltipContent={
                         <>
-                            {t('The true "cost" of barters using Dogtags is difficult to estimate, so you may want to exclude dogtag barters')}
+                            The true "cost" of barters using Dogtags is difficult to estimate, so you may want to exclude dogtag barters
                         </>
                     }
                 />
                 <InputFilter
-                    label={t('Minimum dogtag level')}
+                    label="Minimum dogtag level"
                     defaultValue={useSelector(
                         (state) => state.settings[state.settings.gameMode].minDogtagLevel,
                     )}
@@ -335,14 +316,14 @@ function Settings() {
                     }}
                     tooltip={(
                         <div>
-                            <div>{t('Minimum dogtag level to use for calculating the cost of dogtag barter trades')}</div>
-                            <div>{t(`The current estimated average player level is {{avgPlayerLevel}}`, {avgPlayerLevel: estimatedAvgPlayerLevel})}</div>
+                            <div>Minimum dogtag level to use for calculating the cost of dogtag barter trades</div>
+                            <div>The current estimated average player level is {estimatedAvgPlayerLevel}</div>
                         </div>
                     )}
                 />
-                <h2>{t('Miscellaneous')}</h2>
+                <h2>Miscellaneous</h2>
                 <ToggleFilter
-                    label={t('Hide remote control')}
+                    label="Hide remote control"
                     onChange={handleHideRemoteValueToggle}
                     checked={hideRemoteControlValue}
                 />
@@ -355,8 +336,8 @@ function Settings() {
                 )}
             </div>
             {/* end cheeki breeki */}
-        </div>
-    );
+        </div>,
+    ];
 }
 
-export default withTranslation()(Settings);
+export default Settings;

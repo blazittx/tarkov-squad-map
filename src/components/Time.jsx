@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import dayjsUtc from 'dayjs/plugin/utc';
-import { useTranslation } from 'react-i18next';
 
 import useDate from '../hooks/useDate.jsx';
 
@@ -79,21 +78,19 @@ export function formatFuture(ms) {
 }
 
 function MapDetails(props) {
-    const { t } = useTranslation();
-
     const overlayItem = [
         <div key={`${props.currentMap}-duration`}>
-            {t('Duration')}: {props.duration}
+            Duration: {props.duration}
         </div>,
         <div key={`${props.currentMap}-players`}>
-            {t('Players')}: {props.players}
+            Players: {props.players}
         </div>,
     ];
 
     if (props.author) {
         overlayItem.push(
             <div key={`${props.currentMap}-attribution`}>
-                {t('By')}
+                By
                 <span>:</span> <a href={props.authorLink} target="_blank" rel="noopener noreferrer">{props.author}</a>
             </div>,
         );

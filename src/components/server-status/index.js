@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 // import ApiMetricsGraph from '../../components/api-metrics-graph/index.js';
 import { Tooltip } from '@mui/material';
 
@@ -8,7 +7,6 @@ import './index.css';
 
 function ServerStatus() {
     const { status, data } = useStatusData();
-    const { t } = useTranslation();
 
     if (status !== 'succeeded' || !data) {
         return null;
@@ -30,7 +28,7 @@ function ServerStatus() {
                     arrow
                 >
                     <a href="https://status.escapefromtarkov.com/" target="_blank" rel="noopener noreferrer">
-                        {t(`Tarkov server status`)}
+                        Tarkov server status
                         <div
                             className={`status-indicator status-${data.generalStatus.status}`}
                         />
@@ -47,7 +45,7 @@ function ServerStatus() {
     return (
         <div className={`server-status-wrapper`}>
             <a href="https://status.escapefromtarkov.com/" target="_blank" rel="noopener noreferrer">
-                {t(`Tarkov server status`)}
+                Tarkov server status
                 <div
                     className={`status-indicator status-${data.generalStatus.status}`}
                 />

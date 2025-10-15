@@ -10,7 +10,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import './App.css';
 import theme from './modules/mui-theme.mjs';
 
-import i18n from './i18n.js';
 import loadPolyfills from './modules/polyfills.js';
 
 import RemoteControlId from './components/remote-control-id/index.jsx';
@@ -19,8 +18,6 @@ import makeID from './modules/make-id.js';
 import WindowFocusHandler from './modules/window-focus-handler.mjs';
 
 import Loading from './components/loading/index.js';
-
-import supportedLanguages from './data/supported-languages.json';
 
 import Menu from './components/menu/index.js';
 import Footer from './components/footer/index.js';
@@ -73,20 +70,15 @@ function App() {
             />
         </Suspense>
     );
-    const alternateLangs = supportedLanguages.filter(lang => lang !== i18n.language);
-
     return (
         <ThemeProvider theme={theme}>
         <div className="App">
-            <Helmet htmlAttributes={{ lang: i18n.language }}>
-                <meta property="og:locale" content={i18n.language} key="meta-locale" />
-                {alternateLangs.map((lang) => (
-                    <meta property="og:locale:alternate" content={lang} key={`meta-locale-alt-${lang}`} />
-                ))}
+            <Helmet htmlAttributes={{ lang: 'en' }}>
+                <meta property="og:locale" content="en" key="meta-locale" />
             </Helmet>
             <Menu />
-            <CookieConsent buttonText={i18n.t('I understand')}>
-                {i18n.t('cookie-consent')}
+            <CookieConsent buttonText="I understand">
+                This website uses cookies to ensure you get the best experience on our website.
             </CookieConsent>
             <WindowFocusHandler />
             <ErrorBoundary FallbackComponent={Fallback}>

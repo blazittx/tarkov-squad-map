@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Badge } from '@mui/material';
 
 import './index.css';
@@ -12,11 +11,10 @@ const Sides = {
 function ID(props) {
     const [side, setSide] = useState(Sides.Left);
     const [copied, setCopied] = useState(false);
-    const { t } = useTranslation();
 
     const sessionText = props.socketEnabled
         ? props.sessionID
-        : t('Click to connect');
+        : 'Click to connect';
 
     const handleCopyClick = async () => {
         if (!props.socketEnabled) return;
@@ -50,22 +48,16 @@ function ID(props) {
     return (
         <div
             className={`id-wrapper ${sideClass}`}
-            alt={t(
-                'open this page in another browser or window and connect using this id',
-            )}
-            title={t(
-                'open this page in another browser or window and connect using this id',
-            )}
+            alt="open this page in another browser or window and connect using this id"
+            title="open this page in another browser or window and connect using this id"
             onClick={props.onClick}
         >
             <div className="update-label">
-                {t('ID for remote control')}
+                ID for remote control
                 <span className="session-question">
                     <span>?</span>
                     <div className="session-popup">
-                        {t(
-                            'Go to Tarkov.dev with another browser and enter this ID to control this page from there',
-                        )}
+                        Go to Tarkov.dev with another browser and enter this ID to control this page from there
                     </div>
                 </span>
                 <button
@@ -78,7 +70,7 @@ function ID(props) {
 
             <div className="session-id-container">
                 <Badge
-                    badgeContent={copied ? t('Copied!') : 0}
+                    badgeContent={copied ? 'Copied!' : 0}
                     color="success"
                     anchorOrigin={{
                         vertical: 'bottom',
