@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next';
 
-import ItemSearch from '../../components/item-search/index.js';
-
 import SEO from '../../components/SEO.jsx';
 
 import './index.css';
@@ -16,7 +14,7 @@ function ErrorPage(props) {
         />,
         <div className="page-wrapper error-page" key={'display-wrapper'}>
             <h1>{t("Sorry, that page doesn't exist!")}</h1>
-            <ItemSearch showDropdown />
+            <p>{t('Please check the URL or go back to the')} <a href="/">{t('homepage')}</a>.</p>
         </div>,
     ];
 }

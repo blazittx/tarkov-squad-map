@@ -6,11 +6,8 @@ import { ReactComponent as DiscordIcon } from '../../images/Discord.svg';
 import { ReactComponent as XIcon } from '../../images/X.svg';
 
 import './index.css';
-import UkraineButton from '../ukraine-button/index.js';
-import OpenCollectiveButton from '../open-collective-button/index.js';
 
 import rawVersion from '../../data/version.json';
-import Contributors from '../contributors/index.js';
 
 const version = rawVersion.version.slice(0, 7);
 
@@ -41,23 +38,20 @@ function Footer() {
                 </p>
                 <h3>{t('Contributors')}</h3>
                 <p>{t('Massive thanks to all the people who help build and maintain this project!')}</p>
-                <p>{t('Made with ❤️ by:')}</p>
-                <Contributors size={20} />
+                <p>{t('Made with ❤️ by the community')}</p>
             </div>
             <div className="footer-section-wrapper">
                 <h3>{t('Supporters')}</h3>
                 <Trans i18nKey={'about-support-ukraine-p'}>
                     <p>
-                        We encourage everyone who can to donate to support the people of Ukraine using the button below.
+                        We encourage everyone who can to donate to support the people of Ukraine.
                     </p>
                 </Trans>
-                <UkraineButton large={true}/>
                 <Trans i18nKey={'about-support-collective-p'}>
                     <p>
                         If you'd also like to support this project, you can make a donation and/or become a backer on <a href="https://opencollective.com/tarkov-dev" target="_blank" rel="noopener noreferrer">Open Collective</a>.
                     </p>
                 </Trans>
-                <OpenCollectiveButton large={true}/>
                 <h3>{t('Item Data')}</h3>
                 <p>
                     {t('Fresh EFT data courtesy of')}{' '}

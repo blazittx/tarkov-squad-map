@@ -22,7 +22,6 @@ import { langCode, useLangCode } from '../../modules/lang-helpers.js';
 import { placeholderMaps } from '../../modules/placeholder-data.js';
 import i18n from '../../i18n.js';
 import { windowHasFocus } from '../../modules/window-focus-handler.mjs';
-import { setDataLoading, setDataLoaded } from '../settings/settingsSlice.mjs';
 
 import rawMapData from '../../data/maps.json';
 
@@ -33,9 +32,7 @@ const initialState = {
 };
 
 export const fetchMaps = createAsyncThunk('maps/fetchMaps', (arg, { getState }) => {
-    const state = getState();
-    const gameMode = state.settings.gameMode;
-    return doFetchMaps({language: langCode(), gameMode});
+    return doFetchMaps({language: langCode(), gameMode: 'regular'});
 });
 const mapsSlice = createSlice({
     name: 'maps',
@@ -77,23 +74,10 @@ export default function useMapsData() {
     const dispatch = useDispatch();
     const { data, status, error } = useSelector((state) => state.maps);
     const lang = useLangCode();
-    const gameMode = useSelector((state) => state.settings.gameMode);
     
     useEffect(() => {
-        const dataName = 'maps';
-        if (status === 'idle') {
-            return;
-        } else if (status === 'loading') {
-            dispatch(setDataLoading(dataName));
-        } else {
-            dispatch(setDataLoaded(dataName));
-        }
-    }, [status, dispatch]);
-
-    useEffect(() => {
-        if (fetchedLang !== lang || fetchedGameMode !== gameMode) {
+        if (fetchedLang !== lang) {
             fetchedLang = lang;
-            fetchedGameMode = gameMode;
             dispatch(fetchMaps());
             clearRefreshInterval();
         }
@@ -108,7 +92,7 @@ export default function useMapsData() {
         return () => {
             clearRefreshInterval();
         };
-    }, [dispatch, lang, gameMode]);
+    }, [dispatch, lang]);
     
     return { data, status, error };
 };

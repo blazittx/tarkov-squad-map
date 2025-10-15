@@ -19,12 +19,7 @@ import '../../modules/leaflet-control-map-search.js';
 import '../../modules/leaflet-control-map-settings.js';
 import '../../styles/mapSettings.css';
 
-import { setPlayerPosition } from '../../features/settings/settingsSlice.mjs';
-
 import { useMapImages } from '../../features/maps/index.js';
-import useItemsData from '../../features/items/index.js';
-import useQuestsData from '../../features/quests/index.js';
-import useMetaData from '../../features/meta/index.js';
 
 import staticMapData from '../../data/maps_static.json'
 import rawMapsData from '../../data/maps.json';
@@ -366,10 +361,6 @@ function Map() {
         ref?.current?.resetTransform();
     }, [currentMap]);
 
-    const { data: items } = useItemsData();
-    const { data: quests} = useQuestsData();
-    const { data: metaData } = useMetaData();
-
     let allMaps = useMapImages();
 
     const mapData = useMemo(() => {
@@ -588,8 +579,8 @@ function Map() {
         if (!mapRef.current?.searchControl) {
             return;
         }
-        mapRef.current.searchControl.options.quests = quests;
-    }, [quests]);
+        // mapRef.current.searchControl.options.quests = quests;
+    }, []);
 
     useEffect(() => {
         if (!mapRef.current?.settingsControl?.container) {
@@ -1581,102 +1572,8 @@ function Map() {
             map.layerControl.removeGroupFromMap(groupId);
         }
         //add quest markers
-        const questItems = L.layerGroup();
+        // Quest processing removed - quests feature not available
         const questObjectives = L.layerGroup();
-        for (const quest of quests) {
-            for (const obj of quest.objectives) {
-                if (obj.possibleLocations) {
-                    for (const loc of obj.possibleLocations) {
-                        if (!loc.map?.id) {
-                            continue;
-                        }
-                        if (loc.map.id !== mapData.id) {
-                            continue;
-                        }
-                        for (const position of loc.positions) {
-                            if (!positionIsInBounds(position)) {
-                                continue;
-                            }
-                            const questItemIcon = L.icon({
-                                iconUrl: `${process.env.PUBLIC_URL}/maps/interactive/quest_item.png`,
-                                iconSize: [24, 24],
-                                popupAnchor: [0, -12],
-                                className: quest.active && !obj.complete ? 'active-quest-marker' : 'inactive-quest-marker',
-                            });
-                            const questItemMarker = L.marker(pos(position), {
-                                icon: questItemIcon,
-                                position: position,
-                                title: obj.questItem.name,
-                                id: obj.questItem.id,
-                                questId: quest.id,
-                                riseOnHover: true,
-                            });
-                            const popupContent = L.DomUtil.create('div');
-                            const questLink = getReactLink(`/task/${quest.normalizedName}`, quest.name);
-                            popupContent.append(questLink);
-                            const questItem = L.DomUtil.create('div', 'popup-item', popupContent);
-                            const questItemImage = L.DomUtil.create('img', 'popup-item', questItem);
-                            questItemImage.setAttribute('src', `${obj.questItem.baseImageLink}`);
-                            questItem.append(`${obj.questItem.name}`);
-                            addElevation({position}, popupContent);
-                            questItemMarker.bindPopup(L.popup().setContent(popupContent));
-                            questItemMarker.on('add', checkMarkerForActiveLayers);
-                            questItemMarker.on('click', activateMarkerLayer);
-                            questItemMarker.addTo(questItems);
-
-                            checkMarkerBounds(position, markerBoundsRef.current);
-                        }
-                    }
-                }
-                if (obj.zones) {
-                    for (const zone of obj.zones) {
-                        if (!zone.map?.id || zone.map.id !== mapData.id) {
-                            continue;
-                        }
-                        if (!positionIsInBounds(zone.position)) {
-                            continue;
-                        }
-                        const rect = L.polygon(outlineToPoly(zone.outline), {color: '#e5e200', weight: 1, className: 'not-shown'});
-                        const zoneIcon = L.icon({
-                            iconUrl: `${process.env.PUBLIC_URL}/maps/interactive/quest_objective.png`,
-                            iconSize: [24, 24],
-                            popupAnchor: [0, -12],
-                            className: quest.active && !obj.complete ? 'active-quest-marker' : 'inactive-quest-marker',
-                        });
-                        
-                        const zoneMarker = L.marker(pos(zone.position), {
-                            icon: zoneIcon,
-                            title: obj.description,
-                            position: zone.position,
-                            top: zone.top,
-                            bottom: zone.bottom,
-                            outline: rect,
-                            id: zone.id,
-                            questId: quest.id,
-                            riseOnHover: true,
-                        });
-                        /*zoneMarker.on('click', (e) => {
-                            rect._path.classList.toggle('not-shown');
-                        });*/
-                        zoneMarker.on('mouseover', mouseHoverOutline);
-                        zoneMarker.on('mouseout', mouseHoverOutline);
-                        zoneMarker.on('click', toggleForceOutline);
-                        const popupContent = L.DomUtil.create('div');
-                        const questLink = L.DomUtil.create('div', undefined, popupContent);
-                        questLink.append(getReactLink(`/task/${quest.normalizedName}`, quest.name));
-                        const objectiveText = L.DomUtil.create('div', undefined, popupContent);
-                        objectiveText.textContent = `- ${obj.description}`;
-                        addElevation(zone, popupContent);
-                        zoneMarker.bindPopup(L.popup().setContent(popupContent));
-                        zoneMarker.on('add', checkMarkerForActiveLayers);
-                        L.layerGroup([rect, zoneMarker]).addTo(questObjectives);
-                    }
-                }
-            }
-        }
-        if (Object.keys(questItems._layers).length > 0) {
-            addLayer(questItems, 'quest_item', 'Tasks');
-        }
         if (Object.keys(questObjectives._layers).length > 0) {
             addLayer(questObjectives, 'quest_objective', 'Tasks');
         }
@@ -1688,7 +1585,7 @@ function Map() {
             }
         }
         refreshMapSearch();
-    }, [mapData, quests, addLayer]);
+    }, [mapData, addLayer]);
 
     // for markers requiring game items
     useEffect(() => {
@@ -1714,6 +1611,8 @@ function Map() {
         }
 
         //add locks
+        // Locks processing removed - items feature not available
+        /*
         if (mapData.locks.length > 0) {
             const locks = L.layerGroup();
             for (const lock of mapData.locks) {const key = items.find(i => i.id === lock.key.id);
@@ -1777,8 +1676,11 @@ function Map() {
                 addLayer(locks, 'lock', 'Usable');
             }
         }
+        */
 
         //add loose loot
+        // Loose loot processing removed - items and metaData features not available
+        /*
         if (mapData.lootLoose.length > 0) {
             const looseLootLayers = {};
             for (const looseLoot of mapData.lootLoose) {
@@ -1870,6 +1772,7 @@ function Map() {
                 addLayer(looseLootLayers[layerKey].layer, layerKey, 'Loose Loot', looseLootLayers[layerKey].label, looseLootLayers[layerKey].image);
             }
         }
+        */
         
         for (const id of focusItem.current) {
             if (focusOnPoi(id)) {
@@ -1878,7 +1781,7 @@ function Map() {
             }
         }
         refreshMapSearch();
-    }, [mapData, items, metaData, addLayer, t, tMaps, getPoiLinkElement]);
+    }, [mapData, addLayer, t, tMaps, getPoiLinkElement]);
 
     useEffect(() => {
         if (!mapData || mapData.projection !== 'interactive') {
@@ -1916,7 +1819,6 @@ function Map() {
             const closeButton = L.DomUtil.create('a');
             closeButton.innerHTML = tMaps('Clear');
             closeButton.addEventListener('click', () => {
-                dispatch(setPlayerPosition(null));
             });
             positionMarker.bindPopup(L.popup().setContent(closeButton));
             positionMarker.on('add', checkMarkerForActiveLayers);
