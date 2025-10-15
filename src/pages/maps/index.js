@@ -35,11 +35,6 @@ function Maps() {
                 Maps
             </h1>
             <div className="page-wrapper map-page-wrapper">
-                <p>
-                    There are 11 different locations on the Escape from Tarkov map, of which 10 have been released publicly so far.
-                    Although eventually all maps will be connected, they are currently all apart from one another.
-                </p>
-
                 <nav className="nav-maps">
                   {uniqueMaps.map((map) => (
                       <div className="item" key={`map-link-${map.normalizedName}`}>

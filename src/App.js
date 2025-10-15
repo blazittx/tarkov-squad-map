@@ -20,7 +20,6 @@ import WindowFocusHandler from './modules/window-focus-handler.mjs';
 import Loading from './components/loading/index.js';
 
 import Menu from './components/menu/index.js';
-import Footer from './components/footer/index.js';
 
 const Map = React.lazy(() => import('./pages/map/index.js'));
 const ErrorPage = React.lazy(() => import('./pages/error-page/index.js'));
@@ -124,7 +123,6 @@ function App() {
                     />
                 </Routes>
             </ErrorBoundary>
-            <Footer />
         </div>
         </ThemeProvider>
     );
