@@ -15,16 +15,16 @@ console.log('📡 Starting WebSocket server on port 8001...');
 const wsServer = spawn('node', ['server/websocket-server.js'], {
     env: { ...process.env, WEBSOCKET_PORT: '8001' },
     stdio: 'inherit',
-    cwd: __dirname
+    cwd: __dirname,
 });
 
 // Start React app on port 8000
 console.log('🌐 Starting React app on port 8000...');
-const reactApp = spawn('npx', ['serve', '-s', 'build', '-l', '8000'], {
-    env: { ...process.env, PORT: '8000' },
+const reactApp = spawn('npx', ['react-scripts', 'start'], {
+    env: { ...process.env, PORT: '8000', PUBLIC_URL: '/Tarkov' },
     stdio: 'inherit',
     cwd: __dirname,
-    shell: true
+    shell: true,
 });
 
 // Handle process termination
