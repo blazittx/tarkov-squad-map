@@ -21,7 +21,14 @@ const wsServer = spawn('node', ['server/websocket-server.js'], {
 // Start React app on port 8000
 console.log('🌐 Starting React app on port 8000...');
 const reactApp = spawn('npx', ['react-scripts', 'start'], {
-    env: { ...process.env, PORT: '8000', PUBLIC_URL: '/Tarkov' },
+    env: { 
+        ...process.env, 
+        PORT: '8000', 
+        PUBLIC_URL: '/Tarkov', 
+        HOST: '0.0.0.0',
+        GENERATE_SOURCEMAP: 'false',
+        BROWSER: 'none'
+    },
     stdio: 'inherit',
     cwd: __dirname,
     shell: true,
