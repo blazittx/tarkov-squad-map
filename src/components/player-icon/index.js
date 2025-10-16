@@ -12,7 +12,7 @@ function createPlayerIcon(rotation = 0, size = 48) {
 }
 
 // Player Icon Component
-function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = "Player" }) {
+function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = "Player", isLocalPlayer = false }) {
     const markerRef = React.useRef(null);
     const nameMarkerRef = React.useRef(null);
     
@@ -33,13 +33,13 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
         const { playerUrl, rotationUrl } = createPlayerIcon(rotation);
         
         const playerIcon = L.divIcon({
-            html: `<div class="player-icon-container">
+            html: `<div class="player-icon-container ${isLocalPlayer ? 'local-player' : 'other-player'}">
                 <!-- Player body (never rotates) -->
                 <img src="${playerUrl}" alt="Player Body" class="player-body" style="width: 24px; height: 24px; position: absolute; top: 12px; left: 12px;" />
                 <!-- Rotation indicator (rotates around body) -->
                 <img src="${rotationUrl}" alt="Rotation" class="player-rotation" style="width: 56px; height: 56px; position: absolute; top: -4px; left: -4px; transform: rotate(${rotation}deg);" />
             </div>`,
-            className: 'player-icon-marker',
+            className: `player-icon-marker ${isLocalPlayer ? 'local-player-marker' : 'other-player-marker'}`,
             iconSize: [48, 48],
             iconAnchor: [24, 24]
         });
@@ -53,7 +53,7 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
         // Add popup with player info
         marker.bindPopup(`
             <div class="player-popup">
-                <strong>${playerName}</strong><br>
+                <strong>${playerName}${isLocalPlayer ? ' (You)' : ''}</strong><br>
                 X: ${position.x.toFixed(2)}<br>
                 Z: ${position.z.toFixed(2)}<br>
                 Y: ${position.y?.toFixed(2) || 'N/A'}<br>
@@ -67,7 +67,7 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
         
         // Create name label above the player
         const nameDiv = L.divIcon({
-            html: `<div class="player-name-label">${playerName}</div>`,
+            html: `<div class="player-name-label ${isLocalPlayer ? 'local-player' : 'other-player'}">${playerName}</div>`,
             className: 'player-name-marker',
             iconSize: [120, 30],
             iconAnchor: [60, 35] // Position the name further above the player icon
@@ -92,7 +92,7 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
                 nameMarkerRef.current = null;
             }
         };
-    }, [map, position, rotation, visible, playerName]);
+    }, [map, position, rotation, visible, playerName, isLocalPlayer]);
     
     // Update marker when position or rotation changes
     React.useEffect(() => {
@@ -106,13 +106,13 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
             // Update rotation by recreating the icon with new rotation
             const { playerUrl, rotationUrl } = createPlayerIcon(rotation);
             const newIcon = L.divIcon({
-                html: `<div class="player-icon-container">
+                html: `<div class="player-icon-container ${isLocalPlayer ? 'local-player' : 'other-player'}">
                     <!-- Player body (never rotates) -->
                     <img src="${playerUrl}" alt="Player Body" class="player-body" style="width: 24px; height: 24px; position: absolute; top: 12px; left: 12px;" />
                     <!-- Rotation indicator (rotates around body) -->
                     <img src="${rotationUrl}" alt="Rotation" class="player-rotation" style="width: 56px; height: 56px; position: absolute; top: -4px; left: -4px; transform: rotate(${rotation}deg);" />
                 </div>`,
-                className: 'player-icon-marker',
+                className: `player-icon-marker ${isLocalPlayer ? 'local-player-marker' : 'other-player-marker'}`,
                 iconSize: [48, 48],
                 iconAnchor: [24, 24]
             });
@@ -121,7 +121,7 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
             // Update popup content
             markerRef.current.setPopupContent(`
                 <div class="player-popup">
-                    <strong>${playerName}</strong><br>
+                    <strong>${playerName}${isLocalPlayer ? ' (You)' : ''}</strong><br>
                     X: ${position.x.toFixed(2)}<br>
                     Z: ${position.z.toFixed(2)}<br>
                     Y: ${position.y?.toFixed(2) || 'N/A'}<br>
@@ -129,7 +129,7 @@ function PlayerIcon({ position, rotation = 0, map, visible = true, playerName = 
                 </div>
             `);
         }
-    }, [position, rotation, visible, playerName]);
+    }, [position, rotation, visible, playerName, isLocalPlayer]);
     
     return null; // This component doesn't render anything directly
 }

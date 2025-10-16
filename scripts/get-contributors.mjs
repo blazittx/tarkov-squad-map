@@ -130,7 +130,7 @@ async function getContributors(repository) {
                 login: "hideout-bot",
                 html_url: "https://github.com/hideout-bot",
                 avatar_url: "https://avatars.githubusercontent.com/u/121582168?v=4",
-                totalContributions: 9000,
+                totalContributions: 8000,
             }
         ];
     }

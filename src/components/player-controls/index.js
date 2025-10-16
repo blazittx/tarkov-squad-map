@@ -10,7 +10,10 @@ function PlayerControls({
     setPlayerVisible,
     playerName,
     setPlayerName,
-    mapData 
+    mapData,
+    isConnected,
+    connectionError,
+    otherPlayersCount
 }) {
     const [tempPosition, setTempPosition] = useState({
         x: playerPosition?.x || 0,
@@ -84,6 +87,24 @@ function PlayerControls({
     return (
         <div className="player-controls">
             <h3>Player Position</h3>
+            
+            {/* WebSocket Connection Status */}
+            <div className="control-group">
+                <div className="websocket-status">
+                    <span className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}>
+                        {isConnected ? '🟢' : '🔴'}
+                    </span>
+                    <span className="status-text">
+                        {isConnected ? 'Connected' : 'Disconnected'}
+                        {otherPlayersCount > 0 && ` (${otherPlayersCount} other players)`}
+                    </span>
+                    {connectionError && (
+                        <div className="connection-error">
+                            Error: {connectionError}
+                        </div>
+                    )}
+                </div>
+            </div>
             
             <div className="control-group">
                 <button 

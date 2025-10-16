@@ -398,3 +398,150 @@ div.leaflet-overlay-pane > svg.leaflet-zoom-animated > g > path.off-level {
     margin-bottom: 60px;
 }
 
+/* Apply grayscale filter to all map SVG images */
+.leaflet-image-layer {
+    filter: grayscale(80%);
+}
+
+/* Player Position Control Styles - Responsive Layout */
+#leaflet-control-layers-group-player {
+    margin: 0;
+    padding: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+/* Content container for better organization */
+.player-content-container {
+    padding: 12px 16px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Control rows for consistent spacing */
+.player-control-row {
+    display: flex;
+    flex-direction: column;
+    margin: 6px 0;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Labels */
+.player-control-label {
+    display: block;
+    font-size: 11px;
+    color: var(--color-gold-one);
+    margin: 0 0 4px 0;
+    font-weight: normal;
+    line-height: 1.2;
+}
+
+/* Name input */
+.player-name-input {
+    width: 100%;
+    max-width: 100%;
+    padding: 4px 6px;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    color: var(--color-gold-one);
+    font-size: 11px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.player-name-input:focus {
+    outline: none;
+    border-color: var(--color-gold-one);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Position and rotation displays */
+.player-position-display,
+.player-rotation-display {
+    display: block;
+    font-family: monospace;
+    font-size: 10px;
+    color: var(--color-white);
+    margin: 0;
+    padding: 3px 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+    word-break: break-all;
+    line-height: 1.2;
+}
+
+/* Button container */
+.player-button-container {
+    margin: 8px 0 0 0;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+/* Action buttons */
+.player-action-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 4px 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    color: var(--color-gold-one);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.player-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--color-gold-one);
+}
+
+.player-action-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Status indicator */
+.player-status-indicator {
+    margin-left: 4px;
+    font-size: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+    .player-content-container {
+        padding: 6px;
+    }
+    
+    .player-control-row {
+        margin: 4px 0;
+    }
+    
+    .player-name-input {
+        font-size: 10px;
+        padding: 3px 4px;
+    }
+    
+    .player-position-display,
+    .player-rotation-display {
+        font-size: 9px;
+        padding: 2px 3px;
+    }
+    
+    .player-action-btn {
+        font-size: 9px;
+        padding: 3px 4px;
+    }
+}
+
+/* Ensure proper spacing for checkboxes */
+#leaflet-control-layers-group-player input[type="checkbox"] {
+    margin-right: 4px;
+}
+
+/* Remove old styles that are no longer needed */
+

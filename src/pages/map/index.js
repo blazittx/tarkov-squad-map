@@ -16,6 +16,7 @@ import '../../modules/leaflet-control-groupedlayer.js';
 import '../../modules/leaflet-control-raid-info.js';
 import '../../modules/leaflet-control-map-search.js';
 import '../../modules/leaflet-control-map-settings.js';
+import '../../modules/leaflet-control-player-position.js';
 import '../../styles/mapSettings.css';
 
 import { useMapImages } from '../../features/maps/index.js';
@@ -26,11 +27,11 @@ import rawMapsData from '../../data/maps.json';
 import Time from '../../components/Time.jsx';
 import SEO from '../../components/SEO.jsx';
 import PlayerIcon from '../../components/player-icon/index.js';
-import PlayerControls from '../../components/player-controls/index.js';
 
 import ErrorPage from '../error-page/index.js';
 
 import useStateWithLocalStorage from '../../hooks/useStateWithLocalStorage.jsx';
+import { useWebSocket } from '../../hooks/useWebSocket.jsx';
 
 import './index.css';
 import images from './map-images.mjs';
@@ -341,6 +342,7 @@ function Map() {
 
     const ref = useRef();
     const mapRef = useRef(null);
+    const playerPositionControlRef = useRef(null);
 
     const [mapHeight, setMapHeight] = useState(500); // stores the maximum size of the map canvas
 
@@ -381,6 +383,15 @@ function Map() {
     const mapData = useMemo(() => {
         return allMaps[currentMap];
     }, [allMaps, currentMap]);
+
+    // WebSocket integration for real-time player sharing
+    const { 
+        isConnected, 
+        connectionError, 
+        otherPlayers, 
+        sendPlayerUpdate, 
+        sendPlayerDisconnect 
+    } = useWebSocket(mapData?.key || 'default');
 
     // create the leaflet map on first page render
     useEffect(() => {
@@ -525,6 +536,23 @@ function Map() {
             placeholderText: 'Task, item or container...',
             descriptionText: "Supports multisearch (e.g. 'labs, ledx, bitcoin')",
             collapsed: true,
+        }).addTo(map);
+
+        // Add player position control
+        playerPositionControlRef.current = L.control.playerPosition({
+            position: 'topright',
+            playerPosition: customPlayerPosition,
+            setPlayerPosition: setCustomPlayerPosition,
+            playerRotation: customPlayerRotation,
+            setPlayerRotation: setCustomPlayerRotation,
+            playerVisible: customPlayerVisible,
+            setPlayerVisible: setCustomPlayerVisible,
+            playerName: customPlayerName,
+            setPlayerName: setCustomPlayerName,
+            mapData: mapData,
+            isConnected: isConnected,
+            connectionError: connectionError,
+            otherPlayersCount: otherPlayers.size
         }).addTo(map);
 
         //L.control.scale({position: 'bottomright'}).addTo(map);
@@ -1860,6 +1888,41 @@ function Map() {
         }
     }, [mapData, customPlayerPosition, setCustomPlayerPosition]);
     
+    // Send player updates to WebSocket when player data changes
+    useEffect(() => {
+        if (isConnected && customPlayerVisible) {
+            sendPlayerUpdate({
+                position: customPlayerPosition,
+                rotation: customPlayerRotation,
+                playerName: customPlayerName,
+                visible: customPlayerVisible
+            });
+        }
+    }, [isConnected, customPlayerPosition, customPlayerRotation, customPlayerName, customPlayerVisible, sendPlayerUpdate]);
+    
+    // Send disconnect when component unmounts
+    useEffect(() => {
+        return () => {
+            if (isConnected) {
+                sendPlayerDisconnect();
+            }
+        };
+    }, [isConnected, sendPlayerDisconnect]);
+    
+    // Update player position control when data changes
+    useEffect(() => {
+        if (playerPositionControlRef.current) {
+            playerPositionControlRef.current.updatePlayerData({
+                playerPosition: customPlayerPosition,
+                playerRotation: customPlayerRotation,
+                playerVisible: customPlayerVisible,
+                playerName: customPlayerName,
+                isConnected: isConnected,
+                otherPlayersCount: otherPlayers.size
+            });
+        }
+    }, [customPlayerPosition, customPlayerRotation, customPlayerVisible, customPlayerName, isConnected, otherPlayers.size]);
+    
     if (!mapData) {
         return <ErrorPage />;
     }
@@ -1916,19 +1979,21 @@ function Map() {
                         map={mapRef.current}
                         visible={customPlayerVisible}
                         playerName={customPlayerName}
+                        isLocalPlayer={true}
                     />
-                    <PlayerControls
-                        key="player-controls"
-                        playerPosition={customPlayerPosition}
-                        setPlayerPosition={setCustomPlayerPosition}
-                        playerRotation={customPlayerRotation}
-                        setPlayerRotation={setCustomPlayerRotation}
-                        playerVisible={customPlayerVisible}
-                        setPlayerVisible={setCustomPlayerVisible}
-                        playerName={customPlayerName}
-                        setPlayerName={setCustomPlayerName}
-                        mapData={mapData}
-                    />
+                    
+                    {/* Render other players from WebSocket */}
+                    {Array.from(otherPlayers.entries()).map(([playerId, playerData]) => (
+                        <PlayerIcon
+                            key={`other-player-${playerId}`}
+                            position={playerData.position}
+                            rotation={playerData.rotation}
+                            map={mapRef.current}
+                            visible={playerData.visible}
+                            playerName={playerData.playerName}
+                            isLocalPlayer={false}
+                        />
+                    ))}
                 </>
             )}
         </div>,

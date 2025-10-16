@@ -97,3 +97,29 @@
 .player-name-label {
     /* No animation - clean static text */
 }
+
+/* Local Player Styles */
+.player-icon-container.local-player .player-body {
+    filter: brightness(1.2);
+}
+
+.player-icon-container.local-player .player-rotation {
+    /* No special effects */
+}
+
+.player-name-label.local-player {
+    color: #00ff00;
+}
+
+/* Other Player Styles */
+.player-icon-container.other-player .player-body {
+    filter: brightness(0.9);
+}
+
+.player-icon-container.other-player .player-rotation {
+    /* No special effects */
+}
+
+.player-name-label.other-player {
+    color: #ff6b35;
+}
