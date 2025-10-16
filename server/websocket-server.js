@@ -8,7 +8,7 @@ const server = createServer();
 // Create WebSocket server
 const wss = new WebSocketServer({ 
     server,
-    path: '/ws'
+    path: ''
 });
 
 // Store connected clients and their data
