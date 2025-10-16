@@ -1,0 +1,99 @@
+/* Player Icon Styles */
+.player-icon {
+    transition: all 0.2s ease-in-out;
+}
+
+.player-icon:hover {
+    transform: scale(1.1);
+}
+
+.player-popup {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.player-popup strong {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+/* Player Icon Styles */
+.player-icon-marker {
+    background: transparent !important;
+    border: none !important;
+}
+
+.player-icon-container {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-body {
+    position: absolute !important;
+    top: 12px !important;
+    left: 12px !important;
+    width: 24px !important;
+    height: 24px !important;
+    z-index: 1;
+    transition: none !important;
+}
+
+.player-rotation {
+    position: absolute !important;
+    top: -4px !important;
+    left: -4px !important;
+    width: 56px !important;
+    height: 56px !important;
+    z-index: 2;
+    transition: transform 0.2s ease-in-out;
+}
+
+.player-icon-container:hover .player-body {
+    transform: scale(1.15);
+}
+
+.player-icon-container:hover .player-rotation {
+    transform: scale(1.15) rotate(var(--current-rotation, 0deg)) !important;
+}
+
+.player-popup {
+    font-family: bender, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #00ff00;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.player-popup strong {
+    color: #00ff00;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Player Name Label Styles */
+.player-name-marker {
+    background: transparent !important;
+    border: none !important;
+}
+
+.player-name-label {
+    color: #ffffff;
+    font-family: bender, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    transform: translateY(-15px); /* Move the label further up above the icon */
+}
+
+/* Animation for the name label */
+.player-name-label {
+    /* No animation - clean static text */
+}

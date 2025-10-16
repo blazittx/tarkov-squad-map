@@ -1,0 +1,100 @@
+/* Player Controls Styles - matching raid info control */
+.player-controls {
+    background-color: rgb(from var(--color-black) r g b / 0.5);
+    border: none;
+    border-radius: 0;
+    padding: 10px 20px;
+    color: var(--color-gold-one);
+    font-family: bender, -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 12px;
+    z-index: 1005;
+    min-width: 200px;
+    text-align: right;
+    line-height: normal;
+}
+
+.player-controls h3 {
+    margin: 0 0 10px 0;
+    color: var(--color-gold-one);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.player-controls .control-group {
+    margin-bottom: 10px;
+}
+
+.player-controls label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--color-gold-one);
+    font-family: inherit;
+}
+
+.player-controls input[type="number"] {
+    width: 100%;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: var(--color-gold-one);
+    font-family: inherit;
+}
+
+.player-controls input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-gold-one);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.player-controls input[type="text"] {
+    width: 100%;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: var(--color-gold-one);
+    font-family: inherit;
+    margin-bottom: 5px;
+}
+
+.player-controls input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-gold-one);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.player-controls button {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: var(--color-gold-one);
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.player-controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--color-gold-one);
+}
+
+.player-controls button.active {
+    background: var(--color-gold-one);
+    color: var(--color-black);
+    border-color: var(--color-gold-one);
+}
+
+.player-controls .toggle-button {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.player-controls small {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;
+    line-height: 1.3;
+}

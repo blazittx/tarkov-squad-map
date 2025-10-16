@@ -25,6 +25,8 @@ import rawMapsData from '../../data/maps.json';
 
 import Time from '../../components/Time.jsx';
 import SEO from '../../components/SEO.jsx';
+import PlayerIcon from '../../components/player-icon/index.js';
+import PlayerControls from '../../components/player-controls/index.js';
 
 import ErrorPage from '../error-page/index.js';
 
@@ -281,6 +283,24 @@ function Map() {
             showOnlyActiveTasks: false,
             expandMapLegend: false,
         },
+    );
+
+    // Player position and rotation state
+    const [customPlayerPosition, setCustomPlayerPosition] = useStateWithLocalStorage(
+        'customPlayerPosition',
+        { x: 0, z: 0, y: 0 }
+    );
+    const [customPlayerRotation, setCustomPlayerRotation] = useStateWithLocalStorage(
+        'customPlayerRotation',
+        0
+    );
+    const [customPlayerVisible, setCustomPlayerVisible] = useStateWithLocalStorage(
+        'customPlayerVisible',
+        true
+    );
+    const [customPlayerName, setCustomPlayerName] = useStateWithLocalStorage(
+        'customPlayerName',
+        'Player'
     );
 
     const mapSettingsRef = useRef(savedMapSettings);
@@ -1827,6 +1847,19 @@ function Map() {
         }
     }, [mapData, playerPosition, addLayer, dispatch]);
     
+    // Initialize player position to map center when map changes
+    useEffect(() => {
+        if (mapData?.bounds && mapData.projection === 'interactive') {
+            const centerX = (mapData.bounds[0][1] + mapData.bounds[1][1]) / 2;
+            const centerZ = (mapData.bounds[0][0] + mapData.bounds[1][0]) / 2;
+            
+            // Only update if player position is at origin (initial state)
+            if (customPlayerPosition.x === 0 && customPlayerPosition.z === 0) {
+                setCustomPlayerPosition({ x: centerX, z: centerZ, y: 0 });
+            }
+        }
+    }, [mapData, customPlayerPosition, setCustomPlayerPosition]);
+    
     if (!mapData) {
         return <ErrorPage />;
     }
@@ -1872,6 +1905,32 @@ function Map() {
                 </TransformComponent>
             </TransformWrapper>])}
             <div id="leaflet-map" ref={onMapContainerRefChange} className={'leaflet-map-container'} style={{display: mapData.projection === 'interactive' ? '' : 'none'}}/>
+            
+            {/* Player Icon System - only show on interactive maps */}
+            {mapData.projection === 'interactive' && (
+                <>
+                    <PlayerIcon 
+                        key="player-icon"
+                        position={customPlayerPosition}
+                        rotation={customPlayerRotation}
+                        map={mapRef.current}
+                        visible={customPlayerVisible}
+                        playerName={customPlayerName}
+                    />
+                    <PlayerControls
+                        key="player-controls"
+                        playerPosition={customPlayerPosition}
+                        setPlayerPosition={setCustomPlayerPosition}
+                        playerRotation={customPlayerRotation}
+                        setPlayerRotation={setCustomPlayerRotation}
+                        playerVisible={customPlayerVisible}
+                        setPlayerVisible={setCustomPlayerVisible}
+                        playerName={customPlayerName}
+                        setPlayerName={setCustomPlayerName}
+                        mapData={mapData}
+                    />
+                </>
+            )}
         </div>,
     ];
 }
