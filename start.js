@@ -24,7 +24,6 @@ const reactApp = spawn('npx', ['react-scripts', 'start'], {
     env: { 
         ...process.env, 
         PORT: '8000', 
-        PUBLIC_URL: '/Tarkov', 
         HOST: '0.0.0.0',
         GENERATE_SOURCEMAP: 'false',
         BROWSER: 'none'
