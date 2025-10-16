@@ -11,7 +11,7 @@ export function useWebSocket(mapId = 'default') {
     // WebSocket server URL
     const wsUrl = process.env.NODE_ENV === 'production' 
         ? `wss://${window.location.host}/ws?mapId=${mapId}`
-        : `ws://localhost:8000/ws?mapId=${mapId}`;
+        : `ws://localhost:8001/ws?mapId=${mapId}`;
     
     // Connect to WebSocket server
     const connect = useCallback(() => {

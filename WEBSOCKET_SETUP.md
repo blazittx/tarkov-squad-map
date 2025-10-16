@@ -24,13 +24,22 @@ npm install
 
 ### Running the Application
 
-#### Option 1: Run both servers together (Recommended)
+#### Option 1: Single Entry Point (Recommended)
+```bash
+npm run start-all
+```
+
+This will start both servers automatically:
+- **WebSocket Server**: `ws://localhost:8001/ws`
+- **React App**: `http://localhost:8000`
+
+#### Option 2: Run both servers together
 ```bash
 npm run dev
 ```
-This will start both the WebSocket server (port 8000) and the React development server (port 8001).
+This will start both the WebSocket server (port 8001) and the React development server (port 8000).
 
-#### Option 2: Run servers separately
+#### Option 3: Run servers separately
 ```bash
 # Terminal 1: Start WebSocket server
 npm run websocket-server
@@ -42,7 +51,7 @@ npm start
 ### Testing Multiplayer Functionality
 
 1. **Start the servers** using one of the methods above
-2. **Open multiple browser tabs/windows** to the same map URL (e.g., `http://localhost:8001/map/customs`)
+2. **Open multiple browser tabs/windows** to the same map URL (e.g., `http://localhost:8000/map/customs`)
 3. **Set different player names** in each tab using the Player Controls panel
 4. **Move players** by adjusting position/rotation values
 5. **Observe real-time updates** - you should see other players' icons appear and move in real-time
