@@ -138,3 +138,27 @@
     border-radius: 3px;
     border: 1px solid rgba(244, 67, 54, 0.3);
 }
+
+/* Mode Toggle Button Styles */
+.player-controls .player-mode-toggle {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 2px solid var(--color-gold-one) !important;
+    color: var(--color-gold-one) !important;
+    font-weight: bold !important;
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+}
+
+.player-controls .player-mode-toggle:hover {
+    background: var(--color-gold-one) !important;
+    color: var(--color-black) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+.player-controls .player-mode-toggle:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(255, 215, 0, 0.3);
+}

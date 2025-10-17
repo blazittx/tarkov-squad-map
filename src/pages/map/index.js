@@ -303,6 +303,15 @@ function Map() {
         'customPlayerName',
         'Player'
     );
+    
+    // State for viewer mode (can be toggled via UI)
+    const [isViewerMode, setIsViewerMode] = useState(true);
+    
+    // Callback function for mode changes from the player control
+    const handleModeChange = useCallback((newViewerMode) => {
+        setIsViewerMode(newViewerMode);
+        console.log(`Mode changed to: ${newViewerMode ? 'Viewer' : 'Client'}`);
+    }, []);
 
     const mapSettingsRef = useRef(savedMapSettings);
     const updateSavedMapSettings = useCallback(() => {
@@ -391,9 +400,10 @@ function Map() {
         otherPlayers, 
         sendPlayerUpdate, 
         sendPlayerDisconnect 
-    } = useWebSocket(mapData?.key || 'default');
+    } = useWebSocket(mapData?.key || 'default', isViewerMode);
 
     // create the leaflet map on first page render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (mapRef.current) {
             return;
@@ -552,7 +562,10 @@ function Map() {
             mapData: mapData,
             isConnected: isConnected,
             connectionError: connectionError,
-            otherPlayersCount: otherPlayers.size
+            otherPlayersCount: otherPlayers.size,
+            isViewerMode: isViewerMode, // Dynamic mode - can be toggled via UI
+            onModeChange: handleModeChange, // Callback for mode changes
+            onPlayerDisconnect: sendPlayerDisconnect // Callback for player disconnect
         }).addTo(map);
 
         //L.control.scale({position: 'bottomright'}).addTo(map);
@@ -616,6 +629,7 @@ function Map() {
             levels[activeIndex].addTo(map);
         }, {capture: true});
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [updateSavedMapSettings]);
 
     useEffect(() => {
@@ -1918,10 +1932,12 @@ function Map() {
                 playerVisible: customPlayerVisible,
                 playerName: customPlayerName,
                 isConnected: isConnected,
-                otherPlayersCount: otherPlayers.size
+                connectionError: connectionError,
+                otherPlayersCount: otherPlayers.size,
+                isViewerMode: isViewerMode // Dynamic mode - can be toggled via UI
             });
         }
-    }, [customPlayerPosition, customPlayerRotation, customPlayerVisible, customPlayerName, isConnected, otherPlayers.size]);
+    }, [customPlayerPosition, customPlayerRotation, customPlayerVisible, customPlayerName, isConnected, connectionError, otherPlayers.size, isViewerMode]);
     
     if (!mapData) {
         return <ErrorPage />;

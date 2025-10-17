@@ -1,17 +1,18 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 
 // WebSocket hook for managing real-time player data
-export function useWebSocket(mapId = 'default') {
+// Website viewers are read-only and don't send player updates
+export function useWebSocket(mapId = 'default', isViewerOnly = true) {
     const wsRef = useRef(null);
     const reconnectTimeoutRef = useRef(null);
     const [isConnected, setIsConnected] = useState(false);
     const [connectionError, setConnectionError] = useState(null);
     const [otherPlayers, setOtherPlayers] = useState(new Map());
     
-    // WebSocket server URL
+    // WebSocket server URL - add viewer flag for read-only connections
     const wsUrl = process.env.NODE_ENV === 'production' 
-        ? `wss://${window.location.host}?mapId=${mapId}`
-        : `ws://localhost:8001?mapId=${mapId}`;
+        ? `wss://${window.location.host}/ws?mapId=${mapId}&viewer=${isViewerOnly}`
+        : `ws://localhost:8001/ws?mapId=${mapId}&viewer=${isViewerOnly}`;
     
     // Connect to WebSocket server
     const connect = useCallback(() => {
@@ -132,8 +133,13 @@ export function useWebSocket(mapId = 'default') {
         setOtherPlayers(new Map());
     }, []);
     
-    // Send player update to server
+    // Send player update to server (disabled for viewers)
     const sendPlayerUpdate = useCallback((playerData) => {
+        if (isViewerOnly) {
+            console.log('Viewer mode: Player updates are disabled');
+            return;
+        }
+        
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             const message = {
                 type: 'player_update',
@@ -143,17 +149,22 @@ export function useWebSocket(mapId = 'default') {
         } else {
             console.warn('WebSocket not connected, cannot send player update');
         }
-    }, []);
+    }, [isViewerOnly]);
     
-    // Send player disconnect notification
+    // Send player disconnect notification (disabled for viewers)
     const sendPlayerDisconnect = useCallback(() => {
+        if (isViewerOnly) {
+            console.log('Viewer mode: Player disconnect is disabled');
+            return;
+        }
+        
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             const message = {
                 type: 'player_disconnect'
             };
             wsRef.current.send(JSON.stringify(message));
         }
-    }, []);
+    }, [isViewerOnly]);
     
     // Send ping to keep connection alive
     const ping = useCallback(() => {

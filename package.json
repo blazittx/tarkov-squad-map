@@ -22,8 +22,8 @@
     "preview": "npx serve build -l 3001 -s",
     "critical": "node scripts/critical.mjs",
     "cache-api-data": "node scripts/cache-api-data.mjs",
-    "websocket-server": "node server/websocket-server.js",
-    "dev": "concurrently \"npm run websocket-server\" \"npm start\""
+    "websocket": "node server/websocket-server.js",
+    "dev": "concurrently \"npm run websocket\" \"npm start\""
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

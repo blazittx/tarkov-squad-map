@@ -15,7 +15,10 @@ L.Control.PlayerPosition = L.Control.extend({
         mapData: null,
         isConnected: false,
         connectionError: null,
-        otherPlayersCount: 0
+        otherPlayersCount: 0,
+        isViewerMode: true, // Default to viewer mode (read-only)
+        onModeChange: null, // Callback function for mode changes
+        onPlayerDisconnect: null // Callback function for player disconnect
     },
 
     onAdd: function(map) {
@@ -40,10 +43,6 @@ L.Control.PlayerPosition = L.Control.extend({
         // Group label
         const groupLabel = L.DomUtil.create('label', 'leaflet-control-layers-group-label', playerGroup);
         
-        // Collapse/expand buttons
-        const collapseBtn = L.DomUtil.create('span', 'leaflet-control-layers-group-collapse leaflet-control-layers-group-collapse-default', groupLabel);
-        const expandBtn = L.DomUtil.create('span', 'leaflet-control-layers-group-expand leaflet-control-layers-group-expand-default', groupLabel);
-        
         // Group name
         const groupName = L.DomUtil.create('span', 'leaflet-control-layers-group-name', groupLabel);
         groupName.textContent = 'Player Position';
@@ -57,6 +56,15 @@ L.Control.PlayerPosition = L.Control.extend({
         // Create content container for better organization
         const contentContainer = L.DomUtil.create('div', 'player-content-container', playerGroup);
 
+        // Mode toggle (Client/Viewer)
+        const modeContainer = L.DomUtil.create('div', 'player-control-row', contentContainer);
+        const modeLabel = L.DomUtil.create('label', 'player-control-label', modeContainer);
+        modeLabel.textContent = 'Mode:';
+        const modeToggle = L.DomUtil.create('button', 'player-mode-toggle', modeContainer);
+        modeToggle.textContent = this.options.isViewerMode ? 'Viewer' : 'Client';
+        modeToggle.type = 'button';
+        modeToggle.title = this.options.isViewerMode ? 'Click to switch to Client mode' : 'Click to switch to Viewer mode';
+
         // Player name input
         const nameContainer = L.DomUtil.create('div', 'player-control-row', contentContainer);
         const nameLabel = L.DomUtil.create('label', 'player-control-label', nameContainer);
@@ -65,6 +73,12 @@ L.Control.PlayerPosition = L.Control.extend({
         nameInput.type = 'text';
         nameInput.value = this.options.playerName || 'Player';
         nameInput.placeholder = 'Enter player name';
+        
+        // Disable name input in viewer mode
+        if (this.options.isViewerMode) {
+            nameInput.disabled = true;
+            nameInput.title = 'Viewer mode - name editing disabled';
+        }
 
         // Position display
         const positionContainer = L.DomUtil.create('div', 'player-control-row', contentContainer);
@@ -90,11 +104,20 @@ L.Control.PlayerPosition = L.Control.extend({
         const randomBtn = L.DomUtil.create('button', 'player-action-btn', buttonContainer);
         randomBtn.textContent = 'Random';
         randomBtn.type = 'button';
+        
+        // Disable buttons in viewer mode
+        if (this.options.isViewerMode) {
+            centerBtn.disabled = true;
+            centerBtn.title = 'Viewer mode - position editing disabled';
+            randomBtn.disabled = true;
+            randomBtn.title = 'Viewer mode - position editing disabled';
+        }
 
         // Store references for updates
         this._container = container;
         this._form = form;
         this._toggle = toggle;
+        this._modeToggle = modeToggle;
         this._nameInput = nameInput;
         this._positionSpan = positionSpan;
         this._rotationSpan = rotationSpan;
@@ -105,6 +128,7 @@ L.Control.PlayerPosition = L.Control.extend({
 
         // Event handlers
         L.DomEvent.on(toggle, 'click', this._toggleForm, this);
+        L.DomEvent.on(modeToggle, 'click', this._onModeToggle, this);
         L.DomEvent.on(nameInput, 'change', this._onNameChange, this);
         L.DomEvent.on(centerBtn, 'click', this._onCenterClick, this);
         L.DomEvent.on(randomBtn, 'click', this._onRandomClick, this);
@@ -125,7 +149,71 @@ L.Control.PlayerPosition = L.Control.extend({
         }
     },
 
+    _onModeToggle: function(e) {
+        L.DomEvent.preventDefault(e);
+        
+        const wasClientMode = !this.options.isViewerMode;
+        const newViewerMode = !this.options.isViewerMode;
+        
+        // If switching from client to viewer, send disconnect message first
+        if (wasClientMode && newViewerMode) {
+            console.log('Switching from Client to Viewer - sending disconnect message');
+            if (this.options.onPlayerDisconnect) {
+                // Send disconnect message immediately
+                this.options.onPlayerDisconnect();
+            }
+            
+            // Hide the player icon for the current user when switching to viewer mode
+            if (this.options.setPlayerVisible) {
+                this.options.setPlayerVisible(false);
+                console.log('Hiding player icon for viewer mode');
+            }
+        }
+        
+        // If switching from viewer to client, show the player icon
+        if (!wasClientMode && !newViewerMode) {
+            console.log('Switching from Viewer to Client - showing player icon');
+            if (this.options.setPlayerVisible) {
+                this.options.setPlayerVisible(true);
+                console.log('Showing player icon for client mode');
+            }
+        }
+        
+        // Toggle the mode
+        this.options.isViewerMode = newViewerMode;
+        
+        // Update button text and title
+        this._modeToggle.textContent = this.options.isViewerMode ? 'Viewer' : 'Client';
+        this._modeToggle.title = this.options.isViewerMode ? 'Click to switch to Client mode' : 'Click to switch to Viewer mode';
+        
+        // Update UI elements based on new mode
+        if (this._nameInput) {
+            this._nameInput.disabled = this.options.isViewerMode;
+            this._nameInput.title = this.options.isViewerMode ? 'Viewer mode - name editing disabled' : 'Enter player name';
+        }
+        if (this._centerBtn) {
+            this._centerBtn.disabled = this.options.isViewerMode;
+            this._centerBtn.title = this.options.isViewerMode ? 'Viewer mode - position editing disabled' : 'Center player on map';
+        }
+        if (this._randomBtn) {
+            this._randomBtn.disabled = this.options.isViewerMode;
+            this._randomBtn.title = this.options.isViewerMode ? 'Viewer mode - position editing disabled' : 'Randomize player position';
+        }
+        
+        // Notify parent component about mode change
+        if (this.options.onModeChange) {
+            this.options.onModeChange(this.options.isViewerMode);
+        }
+        
+        console.log(`Switched to ${this.options.isViewerMode ? 'Viewer' : 'Client'} mode`);
+    },
+
     _onNameChange: function(e) {
+        if (this.options.isViewerMode) {
+            console.log('Viewer mode: Name changes are disabled');
+            return;
+        }
+        
         if (this.options.setPlayerName) {
             this.options.setPlayerName(e.target.value);
         }
@@ -133,6 +221,12 @@ L.Control.PlayerPosition = L.Control.extend({
 
     _onCenterClick: function(e) {
         L.DomEvent.preventDefault(e);
+        
+        if (this.options.isViewerMode) {
+            console.log('Viewer mode: Position changes are disabled');
+            return;
+        }
+        
         if (this.options.mapData?.bounds && this.options.setPlayerPosition) {
             const centerX = (this.options.mapData.bounds[0][1] + this.options.mapData.bounds[1][1]) / 2;
             const centerZ = (this.options.mapData.bounds[0][0] + this.options.mapData.bounds[1][0]) / 2;
@@ -142,6 +236,12 @@ L.Control.PlayerPosition = L.Control.extend({
 
     _onRandomClick: function(e) {
         L.DomEvent.preventDefault(e);
+        
+        if (this.options.isViewerMode) {
+            console.log('Viewer mode: Position changes are disabled');
+            return;
+        }
+        
         if (this.options.mapData?.bounds && this.options.setPlayerPosition) {
             const minX = Math.min(this.options.mapData.bounds[0][1], this.options.mapData.bounds[1][1]);
             const maxX = Math.max(this.options.mapData.bounds[0][1], this.options.mapData.bounds[1][1]);
@@ -197,6 +297,23 @@ L.Control.PlayerPosition = L.Control.extend({
             this.options.otherPlayersCount = data.otherPlayersCount;
             if (this._toggle) {
                 this._toggle.setAttribute('data-badge', data.otherPlayersCount > 0 ? data.otherPlayersCount : 'undefined');
+            }
+        }
+        
+        if (data.isViewerMode !== undefined) {
+            this.options.isViewerMode = data.isViewerMode;
+            // Update UI elements based on viewer mode
+            if (this._nameInput) {
+                this._nameInput.disabled = data.isViewerMode;
+                this._nameInput.title = data.isViewerMode ? 'Viewer mode - name editing disabled' : 'Enter player name';
+            }
+            if (this._centerBtn) {
+                this._centerBtn.disabled = data.isViewerMode;
+                this._centerBtn.title = data.isViewerMode ? 'Viewer mode - position editing disabled' : 'Center player on map';
+            }
+            if (this._randomBtn) {
+                this._randomBtn.disabled = data.isViewerMode;
+                this._randomBtn.title = data.isViewerMode ? 'Viewer mode - position editing disabled' : 'Randomize player position';
             }
         }
     }

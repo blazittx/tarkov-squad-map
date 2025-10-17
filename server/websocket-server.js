@@ -1,18 +1,23 @@
 import { WebSocketServer } from 'ws';
-import { createServer } from 'http';
+import express from 'express';
 import { parse } from 'url';
 
-// Create HTTP server
-const server = createServer();
+const PORT_WS = 8001;
 
-// Create WebSocket server
-const wss = new WebSocketServer({ 
-    server,
-    path: '/ws'
+// Configure WebSocket server with proper options
+const wss = new WebSocketServer({
+    port: PORT_WS,
+    host: '0.0.0.0',
+    clientTracking: true,
+    perMessageDeflate: false,
+    maxPayload: 1024 * 1024,
+    pingInterval: 30000,
+    pingTimeout: 60000,
 });
 
 // Store connected clients and their data
 const clients = new Map();
+const viewers = new Map(); // Separate storage for viewers (read-only)
 const playerData = new Map();
 
 // Generate unique client ID
@@ -23,9 +28,16 @@ function generateClientId() {
 // Broadcast data to all connected clients except sender
 function broadcastToOthers(senderId, data) {
     const message = JSON.stringify(data);
-    
+
     clients.forEach((ws, clientId) => {
         if (clientId !== senderId && ws.readyState === ws.OPEN) {
+            ws.send(message);
+        }
+    });
+
+    // Also broadcast to all viewers
+    viewers.forEach((ws) => {
+        if (ws.readyState === ws.OPEN) {
             ws.send(message);
         }
     });
@@ -34,8 +46,15 @@ function broadcastToOthers(senderId, data) {
 // Broadcast to all clients including sender
 function broadcastToAll(data) {
     const message = JSON.stringify(data);
-    
+
     clients.forEach((ws) => {
+        if (ws.readyState === ws.OPEN) {
+            ws.send(message);
+        }
+    });
+
+    // Also broadcast to all viewers
+    viewers.forEach((ws) => {
         if (ws.readyState === ws.OPEN) {
             ws.send(message);
         }
@@ -47,28 +66,42 @@ wss.on('connection', (ws, req) => {
     const clientId = generateClientId();
     const url = parse(req.url, true);
     const mapId = url.query.mapId || 'default';
-    
-    console.log(`Client ${clientId} connected to map: ${mapId}`);
-    
-    // Store client connection
-    clients.set(clientId, ws);
-    
+    const isViewer = url.query.viewer === 'true';
+
+    if (isViewer) {
+        console.log(`Viewer ${clientId} connected to map: ${mapId}`);
+        // Store viewer connection (read-only)
+        viewers.set(clientId, ws);
+    } else {
+        console.log(`Client ${clientId} connected to map: ${mapId}`);
+        // Store client connection (can send player data)
+        clients.set(clientId, ws);
+    }
+
     // Send initial data to new client
     const initialData = {
         type: 'initial_data',
         players: Array.from(playerData.entries()).map(([id, data]) => ({
             id,
-            ...data
-        }))
+            ...data,
+        })),
     };
-    
+
     ws.send(JSON.stringify(initialData));
-    
+
     // Handle incoming messages
     ws.on('message', (data) => {
         try {
             const message = JSON.parse(data.toString());
-            
+
+            // Only allow clients (not viewers) to send player data
+            if (isViewer) {
+                console.log(
+                    `Viewer ${clientId} attempted to send message type: ${message.type} - ignored`,
+                );
+                return;
+            }
+
             switch (message.type) {
                 case 'player_update':
                     // Store player data
@@ -78,9 +111,9 @@ wss.on('connection', (ws, req) => {
                         rotation: message.rotation,
                         playerName: message.playerName || `Player ${clientId}`,
                         visible: message.visible !== false,
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
                     });
-                    
+
                     // Broadcast to other clients
                     broadcastToOthers(clientId, {
                         type: 'player_update',
@@ -90,26 +123,26 @@ wss.on('connection', (ws, req) => {
                         rotation: message.rotation,
                         playerName: message.playerName || `Player ${clientId}`,
                         visible: message.visible !== false,
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
                     });
                     break;
-                    
+
                 case 'player_disconnect':
                     // Remove player data
                     playerData.delete(clientId);
-                    
+
                     // Notify other clients
                     broadcastToOthers(clientId, {
                         type: 'player_disconnect',
-                        playerId: clientId
+                        playerId: clientId,
                     });
                     break;
-                    
+
                 case 'ping':
                     // Respond to ping with pong
                     ws.send(JSON.stringify({ type: 'pong' }));
                     break;
-                    
+
                 default:
                     console.log(`Unknown message type: ${message.type}`);
             }
@@ -117,49 +150,51 @@ wss.on('connection', (ws, req) => {
             console.error('Error parsing message:', error);
         }
     });
-    
+
     // Handle client disconnect
     ws.on('close', () => {
-        console.log(`Client ${clientId} disconnected`);
-        
-        // Remove client and player data
-        clients.delete(clientId);
-        playerData.delete(clientId);
-        
-        // Notify other clients
-        broadcastToOthers(clientId, {
-            type: 'player_disconnect',
-            playerId: clientId
-        });
+        if (isViewer) {
+            console.log(`Viewer ${clientId} disconnected`);
+            viewers.delete(clientId);
+        } else {
+            console.log(`Client ${clientId} disconnected`);
+
+            // Remove client and player data
+            clients.delete(clientId);
+            playerData.delete(clientId);
+
+            // Notify other clients and viewers
+            broadcastToOthers(clientId, {
+                type: 'player_disconnect',
+                playerId: clientId,
+            });
+        }
     });
-    
+
     // Handle errors
     ws.on('error', (error) => {
         console.error(`WebSocket error for client ${clientId}:`, error);
     });
 });
 
-// Start server
-const PORT = process.env.WEBSOCKET_PORT || 8001;
-server.listen(PORT, () => {
-    console.log(`WebSocket server running on port ${PORT}`);
-    console.log(`WebSocket endpoint: ws://localhost:${PORT}/ws`);
-});
+// WebSocket server is already started with the WebSocketServer constructor
+console.log(`WebSocket server running on port ${PORT_WS}`);
+console.log(`WebSocket endpoint: ws://localhost:${PORT_WS}`);
 
 // Clean up inactive players (older than 5 minutes)
 setInterval(() => {
     const now = Date.now();
     const inactiveThreshold = 5 * 60 * 1000; // 5 minutes
-    
+
     playerData.forEach((data, playerId) => {
         if (now - data.timestamp > inactiveThreshold) {
             console.log(`Removing inactive player: ${playerId}`);
             playerData.delete(playerId);
-            
+
             // Notify clients about inactive player removal
             broadcastToAll({
                 type: 'player_disconnect',
-                playerId: playerId
+                playerId: playerId,
             });
         }
     });
@@ -167,9 +202,9 @@ setInterval(() => {
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-    console.log('Shutting down WebSocket server...');
-    server.close(() => {
-        console.log('Server closed');
+    console.log('Shutting down servers...');
+    wss.close(() => {
+        console.log('WebSocket server closed');
         process.exit(0);
     });
 });
