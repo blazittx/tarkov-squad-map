@@ -10,9 +10,7 @@ export function useWebSocket(mapId = 'default', isViewerOnly = true) {
     const [otherPlayers, setOtherPlayers] = useState(new Map());
     
     // WebSocket server URL - add viewer flag for read-only connections
-    const wsUrl = process.env.NODE_ENV === 'production' 
-        ? `wss://${window.location.host}/ws?mapId=${mapId}&viewer=${isViewerOnly}`
-        : `ws://localhost:8001/ws?mapId=${mapId}&viewer=${isViewerOnly}`;
+    const wsUrl = `wss://api.diabolical.studio/tarkov-ws/?mapId=${mapId}&viewer=${isViewerOnly}`;
     
     // Connect to WebSocket server
     const connect = useCallback(() => {
