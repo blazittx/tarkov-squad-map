@@ -297,7 +297,7 @@ function Map() {
     );
     const [customPlayerVisible, setCustomPlayerVisible] = useStateWithLocalStorage(
         'customPlayerVisible',
-        true
+        false
     );
     const [customPlayerName, setCustomPlayerName] = useStateWithLocalStorage(
         'customPlayerName',
@@ -1904,7 +1904,7 @@ function Map() {
     
     // Send player updates to WebSocket when player data changes
     useEffect(() => {
-        if (isConnected && customPlayerVisible) {
+        if (isConnected && customPlayerVisible && !isViewerMode) {
             sendPlayerUpdate({
                 position: customPlayerPosition,
                 rotation: customPlayerRotation,
@@ -1912,7 +1912,7 @@ function Map() {
                 visible: customPlayerVisible
             });
         }
-    }, [isConnected, customPlayerPosition, customPlayerRotation, customPlayerName, customPlayerVisible, sendPlayerUpdate]);
+    }, [isConnected, customPlayerPosition, customPlayerRotation, customPlayerName, customPlayerVisible, isViewerMode, sendPlayerUpdate]);
     
     // Send disconnect when component unmounts
     useEffect(() => {
@@ -1993,7 +1993,7 @@ function Map() {
                         position={customPlayerPosition}
                         rotation={customPlayerRotation}
                         map={mapRef.current}
-                        visible={customPlayerVisible}
+                        visible={customPlayerVisible && !isViewerMode}
                         playerName={customPlayerName}
                         isLocalPlayer={true}
                     />
