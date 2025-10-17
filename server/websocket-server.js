@@ -11,8 +11,6 @@ const wss = new WebSocketServer({
     clientTracking: true,
     perMessageDeflate: false,
     maxPayload: 1024 * 1024,
-    pingInterval: 30000,
-    pingTimeout: 60000,
 });
 
 // Store connected clients and their data
@@ -136,11 +134,6 @@ wss.on('connection', (ws, req) => {
                         type: 'player_disconnect',
                         playerId: clientId,
                     });
-                    break;
-
-                case 'ping':
-                    // Respond to ping with pong
-                    ws.send(JSON.stringify({ type: 'pong' }));
                     break;
 
                 default:
